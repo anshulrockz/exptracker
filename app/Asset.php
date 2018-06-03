@@ -66,6 +66,13 @@ class Asset extends Model
 		$id = Auth::user()->id;
 		$user_type = Auth::user()->user_type;
 
+		if(isset($_GET['location']))
+		{
+			$company = Auth::user()->company_id;
+			$workshop = $_GET['location'];
+			$user_type = 3;
+		}
+		
 		if($user_type == 1 || $user_type == 5){
 			return DB::table('assets')
 				->select( "main_category", "sub_category", DB::raw('SUM(amount) as total') )
@@ -106,49 +113,5 @@ class Asset extends Model
 		}
 	}
 
-	public static function assetoldTotal()
-	{
-		$company = Auth::user()->company_id;
-		$workshop = Auth::user()->workshop_id;
-		$id = Auth::user()->id;
-		$user_type = Auth::user()->user_type;
-
-		if($user_type == 1 || $user_type == 5){
-			return DB::table('assets')
-				->select( DB::raw('SUM(amount) as total') )
-				->where([
-					    ['assets.deleted_at', null],
-					    ['users.workshop_id', $workshop],
-					    ['users.id', $id]
-						])
-	            ->leftJoin('users', 'users.id', '=', 'assets.created_by')
-				->get();
-		}
-
-		if($user_type == 3){
-			return DB::table('asset_news')
-				->select( DB::raw('SUM(amount) as total') )
-				->where([
-					    ['asset_news.deleted_at', null],
-					    ['users.workshop_id', $workshop],
-					    //['users.id', $id]
-						])
-	            ->leftJoin('users', 'users.id', '=', 'asset_news.created_by')
-				->groupBy('main_category', 'sub_category')
-				->get();
-		}
-
-		if($user_type == 4){
-			return DB::table('asset_news')
-				->select( DB::raw('SUM(amount) as total') )
-				->where([
-					    ['asset_news.deleted_at', null],
-					    ['users.workshop_id', $workshop],
-					    ['users.id', $id]
-						])
-	            ->leftJoin('users', 'users.id', '=', 'asset_news.created_by')
-				->groupBy('main_category', 'sub_category')
-				->get();
-		}
-	}
+	
 }

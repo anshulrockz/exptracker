@@ -296,7 +296,7 @@ class Report extends Model
 				])
 	            ->leftJoin('users', 'users.id', '=', 'expenses.created_by')
 	            ->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
-	            ->leftJoin('workshops', 'users.workshop_id', '=', 'workshops.id')
+	            ->leftJoin('workshops', 'expenses.location', '=', 'workshops.id')
 	            ->get();
 		}
 		

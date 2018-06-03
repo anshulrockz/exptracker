@@ -27,6 +27,12 @@
 
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        @include('layouts.flashmessage')
+    </div>
+</div>
+
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="header">
                 <h2>
@@ -68,16 +74,24 @@
                                 	@elseif($list->mode==3) Transfer
                                 	@endif
                                 </td>
-                                <td>{{$list->amount}}</td>
-                                <td>{{$list->user}}</td>
+                                <td>{{$list->amount}} @if(!empty($list->rem_amount)) ({{$list->rem_amount}}) @endif</td>
+                                <td>@if(!empty($list->user)) {{$list->user}} @else {{$list->to_user}} @endif</td>
                                 <td>
-                                    <!-- <a href="{{ url('/deposits/'.$list->id)}}" class="btn btn-sm btn-success"> View </a> -->
+                                    @if(Auth::user()->user_type==1 || Auth::user()->user_type==3)
                                     <a href="{{ url('/deposits/'.$list->id.'/edit')}}" class="btn btn-xs btn-info"> <i class="material-icons">edit</i> </a>
                                     <form style="display: inline;" method="post" action="{{route('deposits.destroy',$list->id)}}">
+                                        {{ csrf_field() }}
+                                        {{ method_field('DELETE') }}
+                                        <button onclick="return confirm('Are you sure you want to Delete?');" type="submit"class="btn btn-xs btn-danger"><i class="material-icons">delete</i></button>
+                                    </form>
+                                    @endif
+                                    @if(Auth::user()->user_type==4)
+                                    <a href="{{ url('user-transactions/'.$list->to_user)}}" class="btn btn-xs btn-primary"> <i class="material-icons">assessment</i> </a>
+                                    <form style="display: inline;" method="post" action="{{url('deposits/return',$list->id)}}">
 				                        {{ csrf_field() }}
-				                        {{ method_field('DELETE') }}
-				                        <button onclick="return confirm('Are you sure you want to Delete?');" type="submit" class="btn btn-xs btn-danger"><i class="material-icons">delete</i></button>
+				                        <button type="submit"class="btn btn-xs btn-primary"><i class="material-icons">assignment_late</i></button>
 				                    </form>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach

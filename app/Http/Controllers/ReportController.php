@@ -13,40 +13,76 @@ class ReportController extends Controller
 {
     public function deposit()
     {
-    	$deposit = Report::all_deposits();
-        return view('report.deposit')->with('report', $deposit);
+        try{
+        	$deposit = Report::all_deposits();
+            return view('report.deposit')->with('report', $deposit);
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 	
 	public function expense()
     {
-    	$expense = Report::all_expenses(); 
-        return view('report.expense')->with('report', $expense);
+        try{
+        	$expense = Report::all_expenses(); 
+            return view('report.expense')->with('report', $expense);
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
 	public function asset()
     {
-        $asset = Report::all_assets();
-        $assetnew = Report::all_asset_news();
-        return view('report.asset')->with(array('report' => $asset, 'reportNew' => $assetnew ));
+        try{
+            $asset = Report::all_assets();
+            $assetnew = Report::all_asset_news();
+            return view('report.asset')->with(array('report' => $asset, 'reportNew' => $assetnew ));
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
     
     public function expiry()
     {
-        $expiry = Report::all_assets_expiry();
-        $expiry2 = Report::all_asset_news_expiry();
-        return view('report.asset-expiry')->with(array('report' => $expiry, 'report2' => $expiry2 ));
+        try{
+            $expiry = Report::all_assets_expiry();
+            $expiry2 = Report::all_asset_news_expiry();
+            return view('report.asset-expiry')->with(array('report' => $expiry, 'report2' => $expiry2 ));
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
     
 	public function ledger()
     {
-        $transaction = Report::all_transaction();
-        return view('report.ledger')->with('report', $transaction);
+        try{
+            $transaction = Report::all_transaction();
+            return view('report.ledger')->with('report', $transaction);
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
 	public function overall()
     {
-        $tests = Report::all();
-        return view('report.overall')->with('report', $expense);
+        try{
+            $tests = Report::all();
+            return view('report.overall')->with('report', $expense);
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
     
     public function datatable_ajax(Request $request)

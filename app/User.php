@@ -45,7 +45,7 @@ class User extends Authenticatable
 	        return DB::table('users')
 				->select('users.*', 'workshops.name as workshop', 'companies.name as company', 'designations.name as designation')
 				->where([
-				['users.deleted_at',null],
+				//['users.deleted_at',null],
                 ['users.id','!=',$id],
 				])
 	            ->leftJoin('companies', 'companies.id', '=', 'users.company_id')
@@ -59,7 +59,7 @@ class User extends Authenticatable
 	        return DB::table('users')
 				->select('users.*', 'workshops.name as workshop', 'companies.name as company')
 				->where([
-				['users.deleted_at',null],
+				//['users.deleted_at',null],
 				['users.company_id',$company_id],
                 ['users.id','!=',$id],
 				])
@@ -73,7 +73,7 @@ class User extends Authenticatable
 	        return DB::table('users')
 				->select('users.*', 'workshops.name as workshop', 'companies.name as company')
 				->where([
-				['users.deleted_at',null],
+				//['users.deleted_at',null],
 				['users.company_id',$company_id],
 				['users.workshop_id',$workshop_id],
                 ['users.id','!=',$id],
@@ -84,6 +84,15 @@ class User extends Authenticatable
 		}
     }
     
+    public static function activateUser($id)
+    {
+        return DB::table('users')
+                ->where([
+                        ['id',$id],
+                        ])
+                ->update(['deleted_at' => null]);
+    }
+
     public function EmployeeType()
     {
         return $this->hasOne('App\EmployeeType', 'id','user_type');

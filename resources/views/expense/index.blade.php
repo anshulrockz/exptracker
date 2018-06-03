@@ -7,6 +7,9 @@
 <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet"/>
 <link href="https://cdn.datatables.net/fixedheader/3.1.3/css/fixedHeader.dataTables.min.css" rel="stylesheet"/>
 
+<!-- Bootstrap Material Datetime Picker Css -->
+<link href="{{ asset('bsb/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css')}}" rel="stylesheet" />
+
     
 <div class="row clearfix">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -23,6 +26,12 @@
                 </ol>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        @include('layouts.flashmessage')
     </div>
 </div>
 
@@ -56,14 +65,18 @@
                         <tbody>
                         	@foreach( $expense as $key=>$list)
                             <tr>
-                            	<td id="{{ $list->voucher_no }}">{{ $list->voucher_no }}</td>
+                            	<td>{{ $list->voucher_no }}</td>
                                 <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
                                 <td>{{$list->party_name}}</td>
-                                <td>{{$list->amount}}</td>
+                                <td>
+                                    @if($list->round_off==1) {{round($list->amount,0)}} @else {{$list->amount}} @endif
+                                </td>
                                 <td>
                                     @if($list->mode==1 || $list->mode=='Cash') Paid
                                     @else Unpaid
-                                    <a href="{{ url('expenses/paid/'.$list->id)}}" class="btn btn-xs btn-warning"> <i class="material-icons">attach_money</i> </a>
+                                        @if(Auth::user()->user_type == 1 || Auth::user()->user_type == 5 && $list->status == 1)
+                                            <button type="button" class="js-modal-buttons btn btn-default btn-xs  waves-effect m-r-20" data-id="{{$list->voucher_no}}" data-amount="{{$list->amount}}" data-toggle="modal" ><i class="material-icons">attach_money</i></button> 
+                                        @endif
                                     @endif
                                 </td>
                                 <td>{{$list->user}}</td>
@@ -77,13 +90,13 @@
                                     @if($list->status==1)
                                     <a href="{{ url('/expenses/'.$list->id.'/edit')}}" class="btn btn-xs btn-info"> <i class="material-icons">edit</i> </a>
                                     
-                                     @php
-	                		$date1=date_create($list->created_at);
-							$date2=date_create(date("y-m-d H:i:s"));
-							$diff=date_diff($date2,$date1);
-							$days = $diff->format("%a");
-	                		@endphp
-	                		@if($days<1) 
+                                    @php
+            	                		$date1=date_create($list->created_at);
+            							$date2=date_create(date("y-m-d H:i:s"));
+            							$diff=date_diff($date2,$date1);
+            							$days = $diff->format("%a");
+        	                		@endphp
+        	                		@if($days<1)
                                     <a href="{{ url('/expenses/cancel/'.$list->id)}}" class="btn btn-xs btn-warning"> <i class="material-icons">cancel</i> </a>
                                     @endif
                                     @endif
@@ -105,12 +118,72 @@
     </div>
 </div>
 
+<!-- Modal Dialogs ====================================================================================================================== -->
+            <!-- Default Size -->
+            <div class="modal fade" id="defaultModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <form method="post" action="{{route('payment-history.store')}}">
+                                {{ csrf_field() }}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="defaultModalLabel">Payment Details</h4>
+                        </div>
+                        <div class="modal-body">
+                                
+                                <label for="voucher_no">Voucher No</label>
+                                <div class="form-group">
+                                    <div class="form-line" id="voucher_no_div">
+                                        <input type="hidden" id="voucher_no" name="voucher_no" class="form-control" placeholder="Enter asset category name" value="{{ old('voucher_no') }}" >
+                                    </div>
+                                </div>
+                                <label for="amount">Amount</label>
+                                <div class="form-group">
+                                    <div class="form-line" id="amount_div">
+                                        <input type="hidden" id="amount" name="amount" class="form-control" placeholder="Enter asset category name" value="{{ old('amount') }}" >
+                                    </div>
+                                </div>
+                                <label for="name">Date</label>
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <input type="text" id="date" name="date" class="form-control datepicker" placeholder="Enter date" value="{{ old('date') }}" required>
+                                    </div>
+                                </div>
+                                <label for="remark">Remark</label>
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <textarea id="remark" name="remark" rows="1" class="form-control no-resize auto-growth" placeholder="Enter remark(press ENTER for more lines)">{{ old('remark') }}</textarea>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-link waves-effect">SAVE</button>
+                            <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">CANCEL</button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+
 <!-- Jquery DataTable Plugin Js -->
-<script src="{{ asset('bsb/plugins/jquery-datatable/jquery.dataTables.js') }}"></script>
-<script src="https://cdn.datatables.net/fixedheader/3.1.3/js/dataTables.fixedHeader.min.js"></script>
+    <script src="{{ asset('bsb/plugins/jquery-datatable/jquery.dataTables.js') }}"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.1.3/js/dataTables.fixedHeader.min.js"></script>
 
 <!-- Select Plugin Js -->
     <script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>
+<!-- Moment Plugin Js -->
+<script src="{{ asset('bsb/plugins/momentjs/moment.js')}}"></script>
+
+<!-- Bootstrap Material Datetime Picker Plugin Js -->
+<script src="{{ asset('bsb/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js')}}"></script>
+
+<script>
+$('.datepicker').bootstrapMaterialDatePicker({
+    format: 'DD MMMM YYYY',
+    clearButton: true,
+    weekStart: 1,
+    time: false
+});
+</script>
 
 <script>
 $(document).ready(function() {
@@ -120,8 +193,27 @@ $(document).ready(function() {
             header: true,
             headerOffset: $('#navbar-collapse').height()
         }
-    } );
-} );
+    });
+});
+
+$(function () {
+    $('.js-modal-buttons').on('click', function () {
+        var color = $(this).data('color');
+        var voucher_no = $(this).data('id');
+        var amount = $(this).data('amount');
+
+        $('#defaultModal .modal-content').removeAttr('class').addClass('modal-content modal-col-' + color);
+        
+        $('#voucher_no_div').html(voucher_no+'<input type="hidden" value="'+voucher_no+'" name="voucher_no" class="form-control" placeholder="Enter asset category name" >');
+
+        $('#amount_div').html(amount+'<input type="hidden" value="'+amount+'" name="amount" class="form-control" placeholder="Enter asset category name" >');
+
+        //$('#voucher_no').val(voucher_no);
+        //$('#amount').val(amount);
+        
+        $('#defaultModal').modal('show');
+    });
+});
 </script>
 
 @endsection

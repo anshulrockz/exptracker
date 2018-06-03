@@ -24,8 +24,25 @@ Auth::routes();
 //Route::get('/', 'HomeController@index')->name('home');
 Route::get('/dashboard', 'HomeController@index')->name('home');
 
+//Reports
+Route::get('report/expenses', 'ReportController@expense');
+
 //Expense
-Route::resource('shared-balances', 'SharedBalanceController');
+Route::get('user-deposit/payeename', 'DepositController@payeename');
+Route::get('user-deposit/payeebalance', 'DepositController@payeeBalance');
+
+//Deposits
+Route::post('/deposits/return/{id}', 'DepositController@return');
+Route::resource('/deposits', 'DepositController');
+
+//cheques
+Route::resource('/cheques', 'ChequeController');
+
+//User Transaction
+Route::resource('user-transactions', 'UserTransactionController');
+
+//Payment History
+Route::resource('payment-history', 'PaymentHistoryController');
 
 //Expense
 Route::get('expenses/partyname', 'ExpenseController@partyname');
@@ -38,14 +55,13 @@ Route::resource('/expenses', 'ExpenseController');
 Route::get('/expense-categories/ajax','ExpenseCategoryController@id_ajax');
 Route::get('/subexpenses/ajax','SubExpenseController@id_ajax');
 
-//Reports
-Route::get('/report/expenses', 'ReportController@expense');
+
 
 Route::group(['middleware' => 'CheckAdmin'], function() {
 	
 	//Reports
 	Route::get('/report/deposits', 'ReportController@deposit');
-	Route::get('/report/expenses', 'ReportController@expense');
+	//Route::get('/report/expenses', 'ReportController@expense');
 	Route::get('/report/assets', 'ReportController@asset');
 	//Route::get('/report/ledgers', 'ReportController@ledger');
 	//Route::get('/report/assets/expiry', 'ReportController@expiry');
@@ -59,16 +75,18 @@ Route::group(['middleware' => 'CheckAdmin'], function() {
 	Route::resource('/assets/old', 'AssetController');
 
 	//Users
+	Route::get('users/activate-user/{id}','UserController@activateUser');
 	Route::get('/users/ajax','UserController@id_ajax');
 	Route::resource('/users', 'UserController');
 	
-	//Deposits
-	Route::resource('/deposits', 'DepositController');
-
 	//Workshop
 	Route::get('/workshops/ajax','WorkshopController@id_ajax');
 
-	
+	//Bank
+	Route::resource('banks','BankController');
+
+	//Vendor
+	Route::resource('vendors','VendorController');
 
 	//Sub Sub Expense Category
 	//Route::get('/subsubexpenses/ajax','SubSubExpenseController@id_ajax');

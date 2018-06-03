@@ -19,7 +19,8 @@ $( document ).ready(function() {
     $("#form select").prop("disabled", true);
     $("#form textarea").prop("disabled", true);
     $("#form-save").prop("disabled", true);
-    $(".delete-row").attr("style", "display:none");
+    $(".delete-row").hide();
+	$(".addTable").hide();
 });
 
 
@@ -30,7 +31,7 @@ $(function() {
      	$("#form select").prop("disabled", false);
     	$("#form textarea").prop("disabled", false);
     	$("#form-save").prop("disabled", false);
-    	@if(Auth::user()->user_type != 5)
+    	@if(Auth::user()->user_type == 4 || Auth::user()->user_type == 3)
     	$("#location").prop("disabled", true);
     	@endif
     	$(".delete-row").removeAttr("style");
@@ -44,17 +45,8 @@ $(function() {
 <script>
 $(function(){
 $("#expense_category_main").change(function(){
-	var id = $('#expense_category_main option:selected').val();
-	var reason = $('#reason_main').val(); 
-	var cost = $('#cost_main').val();
-	var quantity = $('#quantity_main').val();
-	
-	if(id == ''){ alert("Please select category") }
-	else if(reason == ''){ alert("Please enter Description") }
-	else if(cost == ''){ alert("Please enter base value") }
-	else if(quantity == ''){ alert("Please enter quantity") }
-		
-	else{
+	var id = $(this).val();
+	if(id != ''){
 		$('#description_main option').remove();
 		$.ajax({
 			type: "GET",
@@ -79,23 +71,238 @@ $("#expense_category_main").change(function(){
 			}
 		});
 	}
+	else{
+			$('#sub_expenses option').remove();
+		}
 });
 });
 </script>
 
 <script>
 
+// $(function(){
+// 	$(".add-row").click(function(){
+// 		var id = $('#expense_category_main option:selected').val();
+//     	var reason = $('#reason_main').val(); 
+//     	var cost = $('#cost_main').val();
+//     	var quantity = $('#quantity_main').val();
+//     	// var discount = $('#discount').val();
+
+//     	if(id == ''){ alert("Please select category") }
+// 		else if(reason == ''){ alert("Please enter Description") }
+// 		else if(cost == ''){ alert("Please enter base value") }
+// 		else if(quantity == ''){ alert("Please enter quantity") }
+
+// 		else{
+// 			$.ajax({
+// 				type: "GET",
+// 				url: "{{url('expense-categories/ajax')}}",
+// 				data:'id='+id,
+// 				success: function(data){
+// 					var data = JSON.parse(data); 
+// 					//console.log(data);
+// 					var supply_type = data.supply_type; 
+// 	                var category = data.supply_category;
+// 	                var expense_category = data.name;
+// 	                var sgst = 0;
+// 		        	var cgst = 0;
+// 		        	var igst = 0;
+// 		        	var total_cost = 0; 
+// 		        	var total_sgst = 0; 
+// 		        	var total_cgst = 0; 
+// 		        	var total_igst = 0; 
+// 					var total_amount = 0; 
+// 		        	//var type = $('#supply_type_main option:selected').text();
+// 		        	//var category = $('#supply_category_main option:selected').text();
+// 		        	var description = $('#description_main option:selected').text(); 
+// 		        	var reason = $('#reason_main').val(); 
+// 		        	var code = $('#code_main').val();
+// 		        	var cost = $('#cost_main').val();
+// 		        	var quantity = $('#quantity_main').val();
+// 		        	var tax = $('#tax_main').val();
+		        	
+// 		        	if(cost < 0) cost = 0;
+// 		        	if(quantity < 0) quantity = 0;
+
+// 		        	if ($("#radio_1:checked").val() == '1') {
+// 		                sgst = (cost*quantity*tax)/200;
+// 						cgst = (cost*quantity*tax)/200;
+
+// 						$('.sgst_tr').show();
+// 						$('.cgst_tr').show();
+// 						$('.igst_tr').hide();
+// 		            }
+// 					if ($("#radio_2:checked").val() == '2') {
+// 		               igst = (cost*quantity*tax)/100;
+
+// 		               	$('.sgst_tr').hide();
+// 						$('.cgst_tr').hide();
+// 						$('.igst_tr').show();
+// 		            }
+// 		            abt = parseFloat(cost*quantity);
+// 				    amount = parseFloat(cost*quantity)+parseFloat(sgst)+parseFloat(cgst)+parseFloat(igst);
+// 				    amount = parseFloat(amount).toFixed(2);
+
+// 		        	var delBtn = '<button type="button" class="btn btn-danger btn-xs m-t-15 waves-effect delete-row"><i class="material-icons">remove_circle</i></button>';
+
+// 		            var markup = "<tr><td>"+supply_type+"<input name='type[]' class='form-control' type='hidden' value='"+supply_type+"'  /></td><td>"+category+"<input name='category[]' class='form-control' type='hidden' value='"+category+"'  /></td><td>"+expense_category+"<input name='expense_category[]' class='form-control' type='hidden' value='"+expense_category+"'  /></td><td>"+description+"<input name='description[]' class='form-control' type='hidden' value='"+description+"' /></td><td>"+reason+"<input name='reason[]' class='form-control' type='hidden' value='"+reason+"'  /></td><td>"+code+"<input name='code[]' class='form-control' type='hidden' value='"+code+"'  /></td><td class='cost_td'>"+cost+"<input name='cost[]' class='form-control cost1' type='hidden' value='"+cost+"'  /><input name='tax[]' class='form-control' type='hidden' value='"+tax+"'/></td><td class='quantity_td'>"+quantity+"<input name='quantity[]' class='form-control quantity' type='hidden' value='"+quantity+"'  /></td><td class='abt_td'>"+abt+"<input name='abt[]' class='form-control abt' type='hidden' value='"+abt+"'  /></td> <td class='sgst_td'> "+sgst+"<input name='sgst[]' class='form-control sgst' type='hidden' value='"+sgst+"'  />  </td><td class='tax_amount_td'>"+cgst+"<input name='cgst[]' class='form-control cgst' type='hidden' value='"+cgst+"' />  </td><td class='tax_amount_td'>"+igst+" <input name='igst[]' class='form-control igst' type='hidden' value='"+igst+"'  />  </td> <td class='amount_td'> "+amount+" <input name='amount[]' class='form-control unamount1' type='hidden' value='"+amount+"' /> </td><td>"+delBtn+"</td></tr>";
+									  
+// 		            $(".data-field").append(markup);
+
+		            
+// 		            $("input[class *= 'abt']").each(function(){
+// 			        	total_cost += +$(this).val();
+// 			    	}); 
+// 		            $("input[class *= 'sgst']").each(function(){
+// 			        	total_sgst += +$(this).val();
+// 			    	});
+// 			    	$("input[class *= 'cgst']").each(function(){
+// 			        	total_cgst += +$(this).val();
+// 			    	});
+// 			    	$("input[class *= 'igst']").each(function(){
+// 			        	total_igst += +$(this).val();
+// 			    	});
+// 			    	$("input[class *= 'unamount']").each(function(){
+// 			    		total_amount += +$(this).val(); 
+// 			    	}); 
+
+// 			    	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
+// 			    	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
+// 			    	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
+// 			    	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
+// 					$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+
+// 					$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
+// 			    	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
+// 			    	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
+// 			    	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
+// 			    	$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
+// 					// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+
+					
+
+// 	        	}
+// 			});
+// 		}
+//     });
+
+//     $('.data-field').on('click', '.delete-row', function(e){
+// 		e.preventDefault();
+		
+// 		var temp = $(this).closest("td").find('input[type="checkbox"]').val(); 
+// 		if(temp>0)
+// 		{ 
+// 			var markup = '<input name="delRow[]" class="form-control " type="hidden" value="'+temp+'"/>'
+// 			$("#deletedRow").append(markup);
+// 		}
+		
+// 		$(this).closest("tr").remove();
+
+// 		var total_cost = 0; 
+//     	var total_sgst = 0; 
+//     	var total_cgst = 0; 
+//     	var total_igst = 0; 
+// 		var total_amount = 0;
+
+// 		$("input[class *= 'abt']").each(function(){
+//         	total_cost += +$(this).val();
+//     	});  
+//         $("input[class *= 'sgst']").each(function(){
+//         	total_sgst += +$(this).val();
+//     	});
+//     	$("input[class *= 'cgst']").each(function(){
+//         	total_cgst += +$(this).val();
+//     	});
+//     	$("input[class *= 'igst']").each(function(){
+//         	total_igst += +$(this).val();
+//     	});
+//     	$("input[class *= 'unamount']").each(function(){
+//     		total_amount += +$(this).val(); 
+//     	});
+
+//     	if ($("#round_off").prop("checked")==true) {
+//             //total_amount = $('#total_amount').val();
+// 			total_amount = parseFloat(total_amount).toFixed(0);
+//         }
+
+//     	// discount = $('#discount').val();
+
+// 		$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
+//     	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
+//     	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
+//     	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
+// 		$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+
+//     	$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
+//     	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
+//     	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
+//     	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
+//     	$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
+// 		// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+// 	});
+
+// 	$("#round_off").change(function(){
+// 		if ($("#round_off").prop("checked")==true) {
+//             var total_amount = $('#total_amount').val();
+// 			total_amount = parseFloat(total_amount).toFixed(0);
+//         }
+// 		if ($("#round_off").prop("checked")==false) {
+//            total_amount = 0;
+//            $("input[class *= 'unamount']").each(function(){
+// 	    		total_amount += +$(this).val(); 
+// 	    	});
+//         }
+// 		$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
+// 	});
+
+// 	// $('#discount').on('keyup', function(e){
+// 	// 	e.preventDefault();
+		
+		
+//  //    	var discount = $('#discount').val(); 
+//  //    	var total_amount = $('#total_amount').val();
+
+// 	// 	$('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+		
+// 	// }); 
+// }); 
+
 $(function(){
+	$("#radio_3").change(function(){
+		if ($("#radio_3:checked")) {
+            $(".created_for").hide();
+        }
+	});
+
+	$("#radio_4").change(function(){
+		if ($("#radio_4:checked")) {
+            $(".created_for").show();
+        }
+	});
+
 	$(".add-row").click(function(){
-		var id = $('#expense_category_main').val(); 
-		if(id != ''){
+		var id = $('#expense_category_main option:selected').val();
+    	var reason = $('#reason_main').val(); 
+    	var cost = $('#cost_main').val();
+    	var quantity = $('#quantity_main').val();
+    	var description = $('#description_main option:selected').text();
+    	var code = $('#code_main').val();
+    	// var discount = $('#discount').val();
+ 
+
+		if(id == ''){ alert("Please select category") }
+		if(description == '' || description == '--select--'){ alert("Please select sub category") }
+		else if(reason == ''){ alert("Please enter Description") }
+		else if(cost == ''){ alert("Please enter base value") }
+		else if(quantity == ''){ alert("Please enter quantity") }
+
+		else{
 			$.ajax({
 				type: "GET",
 				url: "{{url('expense-categories/ajax')}}",
 				data:'id='+id,
 				success: function(data){
-					var data = JSON.parse(data); 
-					//console.log(data);
+					var data = JSON.parse(data);
 					var supply_type = data.supply_type; 
 	                var category = data.supply_category;
 	                var expense_category = data.name;
@@ -109,34 +316,31 @@ $(function(){
 					var total_amount = 0; 
 		        	//var type = $('#supply_type_main option:selected').text();
 		        	//var category = $('#supply_category_main option:selected').text();
-		        	var description = $('#description_main option:selected').text(); 
-		        	var reason = $('#reason_main').val(); 
-		        	var code = $('#code_main').val();
-		        	var cost = $('#cost_main').val();
-		        	var quantity = $('#quantity_main').val();
+		        	//var description = $('#description_main option:selected').text(); 
+		        	// var code = $('#code_main').val();
 		        	var tax = $('#tax_main').val();
 		        	
 		        	if(cost < 0) cost = 0;
 		        	if(quantity < 0) quantity = 0;
-
 		        	if ($("#radio_1:checked").val() == '1') {
 		                sgst = (cost*quantity*tax)/200;
 						cgst = (cost*quantity*tax)/200;
-
+						$('#tax_type').val(1);
 						$('.sgst_tr').show();
 						$('.cgst_tr').show();
 						$('.igst_tr').hide();
 		            }
 					if ($("#radio_2:checked").val() == '2') {
 		               igst = (cost*quantity*tax)/100;
-
+						$('#tax_type').val(2);
 		               	$('.sgst_tr').hide();
 						$('.cgst_tr').hide();
 						$('.igst_tr').show();
 		            }
+		            
 		            abt = parseFloat(cost*quantity);
 				    amount = parseFloat(cost*quantity)+parseFloat(sgst)+parseFloat(cgst)+parseFloat(igst);
-				    amount = parseFloat(amount).toFixed(2);
+				    amount = parseFloat(amount);
 
 		        	var delBtn = '<button type="button" class="btn btn-danger btn-xs m-t-15 waves-effect delete-row"><i class="material-icons">remove_circle</i></button>';
 
@@ -161,36 +365,43 @@ $(function(){
 			    		total_amount += +$(this).val(); 
 			    	}); 
 
-			    	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-			    	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-			    	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-			    	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-					$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+			    	if ($("#round_off").prop("checked")==true) {
+						total_amount = parseFloat(total_amount).toFixed(0);
+			        }
 
-					$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
-			    	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
-			    	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
-			    	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
-					$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
+			  //   	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
+			  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
+			  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
+			  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
+					// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
 
-					
+					$('.amount_before_tax_td').html(parseFloat(total_cost));
+			    	$('.sgst_amount_td').html(parseFloat(total_sgst));
+			    	$('.cgst_amount_td').html(parseFloat(total_cgst));
+			    	$('.igst_amount_td').html(parseFloat(total_igst));
+					$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(5)+'"/>');
+					// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+
+					$('#radio_1').prop('disabled',true);
+		        	$('#radio_2').prop('disabled',true);
+		        	$('.dataTable').show();
 
 	        	}
 			});
+
+			$('#reason_main').val(''); 
+	    	$('#cost_main').val('');
+	    	$('#quantity_main').val('');
+	    	$('#description_main option').remove(); 
+	    	$('#code_main').val('');
 		}
-		else{ alert("Please select category") }
+
     });
 
     $('.data-field').on('click', '.delete-row', function(e){
 		e.preventDefault();
 		
-		var temp = $(this).closest("td").find('input[type="checkbox"]').val(); 
-		if(temp>0)
-		{ 
-			var markup = '<input name="delRow[]" class="form-control " type="hidden" value="'+temp+'"/>'
-			$("#deletedRow").append(markup);
-		}
-		
+		var del = $(this).closest("tr").find('input[type=checkbox]').val();
 		$(this).closest("tr").remove();
 
 		var total_cost = 0; 
@@ -215,32 +426,49 @@ $(function(){
     		total_amount += +$(this).val(); 
     	});
 
-		$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-    	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-    	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-    	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-		$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+    	if ($("#round_off").prop("checked")==true) {
+            //total_amount = $('#total_amount').val();
+			total_amount = parseFloat(total_amount).toFixed(0);
+        }
+    	// discount = $('#discount').val();
+    	
+		// $('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
+  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
+  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
+  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
+		// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
 
     	$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
     	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
     	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
     	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
-		$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
-	}); 
-});    
+    	$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
+    	$('#deletedRow').append('<input name="delRow[]" class="form-control " type="hidden" value="'+del+'"/>');
+		// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+	});
+
+	$("#round_off").change(function(){
+		if ($("#round_off").prop("checked")==true) {
+            var total_amount = $('#total_amount').val();
+			total_amount = parseFloat(total_amount).toFixed(0);
+        }
+		if ($("#round_off").prop("checked")==false) {
+           total_amount = 0;
+           $("input[class *= 'unamount']").each(function(){
+	    		total_amount += +$(this).val();
+	    	});
+	    		total_amount = parseFloat(total_amount).toFixed(2); 
+        }
+		$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
+	});
+
+	
+});   
 
 
 
 $(document).ready(function() {
 	$('.addTable').hide();
-// 	$('.sub_expense').hide();
-// 	$('.purchase').hide();
-// 	$('.expense').hide();
-// 	$('.common').hide();
-// 	$('.acc_no').hide();
-// 	$('.ifsc').hide();
-// 	$('.txn_no').hide();
-// 	$('.dataTable').hide();
 });
 
 </script>
@@ -344,8 +572,8 @@ $(document).ready(function() {
 		                    <div class="form-group">
 		                        <div class="form-line">
 		                            <select class="form-control show-tick" id="mode" name="mode">
-			                            <option value="1" @if($expense->mode==1) selected @endif >Cash</option>
-			                            <option value="2" @if($expense->mode==2) selected @endif >Credit</option>
+			                            <option value="1" @if($expense->paid_in==1) selected @endif >Cash</option>
+			                            <option value="2" @if($expense->paid_in==2) selected @endif >Credit</option>
 			                        </select>
 		                        </div>
 		                    </div>
@@ -354,7 +582,7 @@ $(document).ready(function() {
 		                    <label for="location">Location</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                            <select class="form-control show-tick" id="location" name="location" @if(Auth::user()->user_type != 5) disabled @endif>
+		                            <select class="form-control show-tick" id="location" name="location" @if(Auth::user()->user_type == 4 || Auth::user()->user_type == 3) disabled @endif>
 			                            <option >select</option>
 			                            @foreach($workshop as $list)
 			                            <option value="{{$list->id}}" @if($expense->location == $list->id) selected @endif >{{$list->name}}</option>
@@ -610,6 +838,19 @@ $(document).ready(function() {
 						                    </div> -->
 					                	</td>
 		                            </tr>
+		                            <!-- <tr>
+		                            	<th colspan="12" style="text-align: right;">Discount</th>
+		                            	<td class="discount">
+		                                	<div class="form-group form-float" style="margin-bottom: -5px;margin-top: -8px;">
+						                        <div class="form-line">
+					                                <div class="fallback">
+					                                    <input name="discount" id="discount" class="form-control" type="number" value="{{$expense->discount}}" />
+					                                </div>
+							                    </div>
+						                    </div>
+					                	</td>
+					                	<th></th>
+		                            </tr> -->
 		                            @if( $expense->inv_type == 1 )
 		                            <tr class="sgst_tr">
 		                            	<th colspan="12" style="text-align:right;">SGST Amount</th>
@@ -664,7 +905,25 @@ $(document).ready(function() {
 							                    </div>
 						                    </div> -->
 					                	</td>
+					                	<td>
+					                		<input type="checkbox" id="round_off" name="round_off" @if( $expense->round_off == 1 ) checked @endif value="1">
+			                                <label for="round_off">Round Off</label>
+			                            </td>
 		                            </tr>
+		                            <!-- <tr class="">
+		                            	<th colspan="12" style="text-align: right;">Total Amount</th>
+		                            	<td class="total_discount_td">
+		                            		{{ $total_cost + $total_sgst + $total_cgst + $total_igst }}
+		                                	<div class="form-group form-float">
+						                        <div class="form-line">
+					                                <div class="fallback">
+					                                    <input name="total_discount_amount" id="total_discount_amount" class="form-control " type="hidden" value="{{ $total_amount - $expense->discount }}"/>
+					                                <!-- </div>
+							                    </div>
+						                    </div> ->
+					                	</td>
+					                	<th></th>
+		                            </tr> -->
 		                        </tfoot>
 		                    </table>
 	                	</div>
@@ -744,18 +1003,24 @@ $( document ).ready(function() {
 	else
 		$('#radio_2').attr("checked",true);
 
-	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-	$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+	if ($("#round_off").prop("checked")==true) {
+		total_amount = parseFloat(total_amount).toFixed(0);
+    }
+	// discount = $('#discount').val();
 
-	$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
-	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
-	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
-	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
-	//$('.total_amount_td').html(parseFloat(total_amount).toFixed(2));
-	$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
+	$('input#amount_before_tax').val(parseFloat(total_cost));
+	$('input#sgst_amount').val(parseFloat(total_sgst));
+	$('input#cgst_amount').val(parseFloat(total_cgst));
+	$('input#igst_amount').val(parseFloat(total_igst));
+	$('input#total_amount').val(parseFloat(total_amount));
+
+	$('.amount_before_tax_td').html(parseFloat(total_cost));
+	$('.sgst_amount_td').html(parseFloat(total_sgst));
+	$('.cgst_amount_td').html(parseFloat(total_cgst));
+	$('.igst_amount_td').html(parseFloat(total_igst));
+	//$('.total_amount_td').html(parseFloat(total_amount));
+	$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
+	// $('.total_discount_td').html(parseFloat(total_amount-discount)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount)+'"/>');
 
 });
 

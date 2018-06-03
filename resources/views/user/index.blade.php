@@ -79,15 +79,17 @@
                                 	@else {{ date_format(date_create($list->last_login_at),'d/m/Y H:i')}}
                                 	@endif
                                 </td>
-                                <td>
-                                    <!-- <a href="{{ url('/users/'.$list->id)}}" class="btn btn-sm btn-success"> <i class="material-icons">pageview</i> </a> -->
-                                    @if(auth::user()->user_type != 4)
-                                    <a href="{{ url('/users/'.$list->id.'/edit')}}" class="btn btn-sm btn-info"> <i class="material-icons">edit</i> </a>
+                                <td style="width: 65px">
+                                    
+                                    @if($list->deleted_at == '' || $list->deleted_at == '0000-00-00 00:00:00')
+                                    <a href="{{ url('/users/'.$list->id.'/edit')}}" class="btn btn-xs btn-info"> <i class="material-icons">edit</i> </a>
                                     <form style="display: inline;" method="post" action="{{route('users.destroy',$list->id)}}">
 				                        {{ csrf_field() }}
 				                        {{ method_field('DELETE') }}
-				                        <button onclick="return confirm('Are you sure you want to Delete?');" type="submit" class="btn btn-sm btn-danger"><i class="material-icons">delete</i></button>
+				                        <button onclick="return confirm('Are you sure you want to Delete?');" type="submit" class="btn btn-xs btn-danger" title="Deactivate"><i class="material-icons">lock_outline</i></button>
 				                    </form>
+                                    @else
+                                    <a title="Activate" href="{{ url('users/activate-user/'.$list->id)}}" class="btn btn-xs btn-success"> <i class="material-icons">lock_open</i> </a>
 				                    @endif
                                 </td>
                             </tr>

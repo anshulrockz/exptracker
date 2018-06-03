@@ -20,8 +20,14 @@ class AssetCategoryController extends Controller
     
     public function index()
     {
-    	$asset_category = AssetCategory::all();
-        return view('asset_category.index')->with('asset_category', $asset_category);
+        try{
+        	$asset_category = AssetCategory::all();
+            return view('asset_category.index')->with('asset_category', $asset_category);
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
     /**
@@ -31,7 +37,13 @@ class AssetCategoryController extends Controller
      */
     public function create()
     {
-        return view('asset_category.create');
+        try{
+            return view('asset_category.create');
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
     /**
@@ -45,23 +57,28 @@ class AssetCategoryController extends Controller
         $this->validate($request,[
 			'name'=>'required|max:255',
 		]);
-		
-		$asset_category = new AssetCategory;
-		$asset_category->name = $request->name;
-		$asset_category->description = $request->description;
-		$asset_category->status = 1;
-		$asset_category->user_sys = \Request::ip();
-		$asset_category->updated_by = Auth::id();
-		$asset_category->created_by = Auth::id();
-		
-		$result = $asset_category->save();
-		
-		if($result){
-			return back()->with('success', 'Record added successfully!');
-		}
-		else{
-			return back()->with('error', 'Something went wrong!');
-		}
+		try{
+    		$asset_category = new AssetCategory;
+    		$asset_category->name = $request->name;
+    		$asset_category->description = $request->description;
+    		$asset_category->status = 1;
+    		$asset_category->user_sys = \Request::ip();
+    		$asset_category->updated_by = Auth::id();
+    		$asset_category->created_by = Auth::id();
+    		
+    		$result = $asset_category->save();
+    		
+    		if($result){
+    			return back()->with('success', 'Record added successfully!');
+    		}
+    		else{
+    			return back()->with('error', 'Something went wrong!');
+    		}
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
     /**
@@ -72,8 +89,15 @@ class AssetCategoryController extends Controller
      */
     public function show($id)
     {
-        $asset_category = AssetCategory::find($id);
-        return view('asset_category.show')->with('asset_category', $asset_category);
+        try{
+            $asset_category = AssetCategory::find($id);
+            return view('asset_category.show')->with('asset_category', $asset_category);
+    
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
     /**
@@ -84,8 +108,14 @@ class AssetCategoryController extends Controller
      */
     public function edit($id)
     {
-        $asset_category = AssetCategory::find($id);
-        return view('asset_category.edit')->with(array('asset_category'=> $asset_category));
+        try{
+            $asset_category = AssetCategory::find($id);
+            return view('asset_category.edit')->with(array('asset_category'=> $asset_category));
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
     /**
@@ -100,22 +130,27 @@ class AssetCategoryController extends Controller
         $this->validate($request,[
 			'name'=>'required|max:255',
 		]);
-		
-		$asset_category = AssetCategory::find($id);
-		$asset_category->name = $request->name;
-		$asset_category->description = $request->description;
-		$asset_category->status = 1;
-		$asset_category->user_sys = \Request::ip();
-		$asset_category->updated_by = Auth::id();
-		
-		$result = $asset_category->save();
-		
-		if($result){
-			return redirect()->back()->with('success', 'Record updated successfully!');
-		}
-		else{
-			return redirect()->back()->with('error', 'Something went wrong!');
-		}
+        try{	
+    		$asset_category = AssetCategory::find($id);
+    		$asset_category->name = $request->name;
+    		$asset_category->description = $request->description;
+    		$asset_category->status = 1;
+    		$asset_category->user_sys = \Request::ip();
+    		$asset_category->updated_by = Auth::id();
+    		
+    		$result = $asset_category->save();
+    		
+    		if($result){
+    			return redirect()->back()->with('success', 'Record updated successfully!');
+    		}
+    		else{
+    			return redirect()->back()->with('error', 'Something went wrong!');
+    		}
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 
     /**
@@ -126,13 +161,19 @@ class AssetCategoryController extends Controller
      */
     public function destroy($id)
     {
-        $asset_category = AssetCategory::find($id);
-        $result = $asset_category->delete($id);
-        if($result){
-			return redirect()->back()->with('success', 'Record deleted successfully!');
-		}
-		else{
-			return redirect()->back()->with('error', 'Something went wrong!');
-		}
+        try{
+            $asset_category = AssetCategory::find($id);
+            $result = $asset_category->delete($id);
+            if($result){
+    			return redirect()->back()->with('success', 'Record deleted successfully!');
+    		}
+    		else{
+    			return redirect()->back()->with('error', 'Something went wrong!');
+    		}
+        }
+        catch(\Exception $e){
+            $error = $e->getMessage();
+            return back()->with('error', 'Something went wrong! Please contact admin');
+        }
     }
 }

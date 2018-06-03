@@ -14,6 +14,7 @@ $(function(){
 	$("#company").change(function(){
 		var id = $(this).val();
 		if(id != ''){
+			$('#workshop option').remove();
 			$.ajax({
 				type: "GET",
 				url: "{{url('/workshops/ajax')}}",

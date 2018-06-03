@@ -51,13 +51,30 @@ $("#expense_category_main").change(function(){
 <script>
 
 $(function(){
+	$("#radio_3").change(function(){
+		if ($("#radio_3:checked")) {
+            $(".created_for").hide();
+        }
+	});
+
+	$("#radio_4").change(function(){
+		if ($("#radio_4:checked")) {
+            $(".created_for").show();
+        }
+	});
+
 	$(".add-row").click(function(){
 		var id = $('#expense_category_main option:selected').val();
     	var reason = $('#reason_main').val(); 
     	var cost = $('#cost_main').val();
     	var quantity = $('#quantity_main').val();
+    	var description = $('#description_main option:selected').text();
+    	var code = $('#code_main').val();
+    	// var discount = $('#discount').val();
+ 
 
 		if(id == ''){ alert("Please select category") }
+		if(description == '' || description == '--select--'){ alert("Please select sub category") }
 		else if(reason == ''){ alert("Please enter Description") }
 		else if(cost == ''){ alert("Please enter base value") }
 		else if(quantity == ''){ alert("Please enter quantity") }
@@ -82,8 +99,8 @@ $(function(){
 					var total_amount = 0; 
 		        	//var type = $('#supply_type_main option:selected').text();
 		        	//var category = $('#supply_category_main option:selected').text();
-		        	var description = $('#description_main option:selected').text(); 
-		        	var code = $('#code_main').val();
+		        	//var description = $('#description_main option:selected').text(); 
+		        	// var code = $('#code_main').val();
 		        	var tax = $('#tax_main').val();
 		        	
 		        	if(cost < 0) cost = 0;
@@ -103,9 +120,10 @@ $(function(){
 						$('.cgst_tr').hide();
 						$('.igst_tr').show();
 		            }
+		            
 		            abt = parseFloat(cost*quantity);
 				    amount = parseFloat(cost*quantity)+parseFloat(sgst)+parseFloat(cgst)+parseFloat(igst);
-				    amount = parseFloat(amount).toFixed(2);
+				    amount = parseFloat(amount);
 
 		        	var delBtn = '<button type="button" class="btn btn-danger btn-xs m-t-15 waves-effect delete-row"><i class="material-icons">remove_circle</i></button>';
 
@@ -130,17 +148,22 @@ $(function(){
 			    		total_amount += +$(this).val(); 
 			    	}); 
 
-			    	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-			    	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-			    	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-			    	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-					$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+			    	if ($("#round_off").prop("checked")==true) {
+						total_amount = parseFloat(total_amount).toFixed(0);
+			        }
 
-					$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
-			    	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
-			    	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
-			    	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
-					$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
+			  //   	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
+			  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
+			  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
+			  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
+					// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+
+					$('.amount_before_tax_td').html(parseFloat(total_cost));
+			    	$('.sgst_amount_td').html(parseFloat(total_sgst));
+			    	$('.cgst_amount_td').html(parseFloat(total_cgst));
+			    	$('.igst_amount_td').html(parseFloat(total_igst));
+					$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(5)+'"/>');
+					// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
 
 					$('#radio_1').prop('disabled',true);
 		        	$('#radio_2').prop('disabled',true);
@@ -148,7 +171,14 @@ $(function(){
 
 	        	}
 			});
+
+			$('#reason_main').val(''); 
+	    	$('#cost_main').val('');
+	    	$('#quantity_main').val('');
+	    	$('#description_main option').remove(); 
+	    	$('#code_main').val('');
 		}
+
     });
 
     $('.data-field').on('click', '.delete-row', function(e){
@@ -178,23 +208,58 @@ $(function(){
     		total_amount += +$(this).val(); 
     	});
 
-		$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-    	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-    	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-    	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-		$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
+    	if ($("#round_off").prop("checked")==true) {
+            //total_amount = $('#total_amount').val();
+			total_amount = parseFloat(total_amount).toFixed(0);
+        }
+    	// discount = $('#discount').val();
+    	
+		// $('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
+  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
+  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
+  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
+		// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
 
-    	$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
-    	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
-    	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
-    	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
-		$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
-	}); 
+    	$('.amount_before_tax_td').html(parseFloat(total_cost));
+    	$('.sgst_amount_td').html(parseFloat(total_sgst));
+    	$('.cgst_amount_td').html(parseFloat(total_cgst));
+    	$('.igst_amount_td').html(parseFloat(total_igst));
+    	$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
+		// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+	});
+
+	$("#round_off").change(function(){
+		if ($("#round_off").prop("checked")==true) {
+            var total_amount = $('#total_amount').val();
+			total_amount = parseFloat(total_amount).toFixed(0);
+        }
+		if ($("#round_off").prop("checked")==false) {
+           total_amount = 0;
+           $("input[class *= 'unamount']").each(function(){
+	    		total_amount += +$(this).val(); 
+	    	});
+        }
+		$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
+	});
+
+	// $('#discount').on('keyup', function(e){
+	// 	e.preventDefault();
+		
+	// 	var discount = 0; 
+	// 	var total_amount = 0;
+
+ //    	discount = $('#discount').val();
+ //    	total_amount = $('#total_amount').val();
+
+	// 	$('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+		
+	// }); 
 });    
 
 
 
 $(document).ready(function() {
+	$('.created_for').hide();
 	$('.sub_expense').hide();
 	$('.purchase').hide();
 	$('.expense').hide();
@@ -235,27 +300,39 @@ $(document).ready(function() {
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
-            <div class="header">
-                <h2>
-                    Details
-                </h2>
-                <b>
-	                @if($balance)
-	                Balance({{$balance}})
-	                @else
-	                Bal- 0
-	                @endif
-                </b>
-                <br>
-                <b>
-	                @if($shared_balance>0)
-	                Shared Balance({{$shared_balance}})
-	                @endif
-                </b>
-            </div>
-            <div class="body">
-                <form method="post" action="{{route('expenses.store')}}" enctype="multipart/form-data">
-                	{{ csrf_field() }}
+        	<form method="post" action="{{route('expenses.store')}}" enctype="multipart/form-data">
+            	{{ csrf_field() }}
+	            <div class="header row">
+	                <h2>
+	                    <div class="form-line" class="balName">
+	                    	<div class="col-sm-6">
+		                		Details
+		                		@if(Auth::user()->user_type == 4)
+		                        <input name="group2" type="radio" id="radio_3" value="1" checked />
+	                            <label for="radio_3"><b>@if($balance) Balance({{$balance}}) @else Balance 0 @endif</b></label>
+	                            <input name="group2" type="radio" id="radio_4" value="2" />
+	                            <label for="radio_4"><b>Shared</b></label>
+                        	</div>
+                            <div class="col-sm-4 created_for">
+                            	<div class="form-group ">
+			                        <div class="form-line ">
+	                            		<input name="created_for" id="created_for" class="form-control" type="text" placeholder="enter name of employee" />
+	                            	</div>
+	                            </div>
+                            </div>
+                            <div class="col-sm-2 ">
+                            	<div class="form-group ">
+			                        <div class="form-line payeebalance">
+	                            	</div>
+	                            </div>
+                            </div>
+                            @else
+                            @if($balance) Balance({{$balance}}) @else Balance 0 @endif
+                            @endif
+	                    </div>
+	                </h2>
+	            </div>
+            	<div class="body">
                 	 <div class="row clearfix">
 	                	<div class="col-sm-3">
 	                		<label for="voucher_no">Voucher No.(auto)</label>
@@ -311,7 +388,7 @@ $(document).ready(function() {
 		                        <div class="form-line">
 		                            <select class="form-control show-tick" id="mode" name="mode">
 			                            <option value="1">Cash</option>
-			                            <option value="2">Credit</option>
+			                            <option value="2" @if($balance<0) selected @endif >Credit</option>
 			                        </select>
 		                        </div>
 		                    </div>
@@ -502,6 +579,19 @@ $(document).ready(function() {
 					                	</td>
 					                	<th></th>
 		                            </tr>
+		                            <!-- <tr>
+		                            	<th colspan="12" style="text-align: right;">Discount</th>
+		                            	<td class="discount">
+		                                	<div class="form-group form-float" style="margin-bottom: -5px;margin-top: -8px;">
+						                        <div class="form-line">
+					                                <div class="fallback">
+					                                    <input name="discount" id="discount" class="form-control" type="number" value="0" />
+					                                </div>
+							                    </div>
+						                    </div>
+					                	</td>
+					                	<th></th>
+		                            </tr> -->
 		                            <tr class="sgst_tr">
 		                            	<th colspan="12" style="text-align: right;">SGST Amount</th>
 		                            	<td class="sgst_amount_td">
@@ -547,13 +637,29 @@ $(document).ready(function() {
 		                                	<!-- <div class="form-group form-float">
 						                        <div class="form-line">
 					                                <div class="fallback"> -->
-					                                    <input name="total_amount" id="total_amount" class="form-control " type="text" />
+					                                    <input name="total_amount" id="total_amount" class="form-control " type="hidden" />
 					                                <!-- </div>
 							                    </div>
 						                    </div> -->
 					                	</td>
-					                	<th></th>
+					                	<td>
+					                		<input type="checkbox" id="round_off" name="round_off" value="1">
+			                                <label for="round_off">Round Off</label>
+			                            </td>
 		                            </tr>
+		                            <!-- <tr class="">
+		                            	<th colspan="12" style="text-align: right;">Total Amount</th>
+		                            	<td class="total_discount_td">
+		                                	<div class="form-group form-float">
+						                        <div class="form-line">
+					                                <div class="fallback">
+					                                    <input name="total_discount_amount" id="total_discount_amount" class="form-control " type="hidden" />
+					                                <!-- </div>
+							                    </div>
+						                    </div> ->
+					                	</td>
+					                	<th></th>
+		                            </tr> -->
 		                        </tfoot>
 		                    </table>
 	                	</div>
@@ -563,8 +669,8 @@ $(document).ready(function() {
 	                		<button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
 	                	</div>
 	                </div>
-                </form>
-            </div>
+            	</div>
+            </form>
         </div>
     </div>
 </div>
@@ -588,6 +694,7 @@ $('.datepicker').bootstrapMaterialDatePicker({
 
 <script>
   $( function() {
+
     $( "#party_name" ).autocomplete({
       source: '{{url('expenses/partyname')}}',
       minLength:1,
@@ -607,6 +714,28 @@ $('.datepicker').bootstrapMaterialDatePicker({
 	                var category = data.supply_category;
 	    }});
 	});
+
+
+    $( "#created_for" ).autocomplete({
+      source: '{{url('user-deposit/payeename')}}',
+      minLength:1,
+      maxLength:10
+    });
+    
+    $("#created_for").change(function(){
+		var created_for = $( "#created_for" ).val();
+		$.ajax({
+				type: "GET",
+				url: "{{url('user-deposit/payeebalance')}}",
+				data:'created_for='+created_for,
+				success: function(data){
+					console.log(data);
+					var data = JSON.parse(data);
+					$( ".payeebalance" ).html('Balance('+data+')');
+	                var category = data.supply_category;
+	    }});
+	});
+
   });
   </script>
     

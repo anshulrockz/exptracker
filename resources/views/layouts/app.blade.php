@@ -337,6 +337,12 @@
                             <span>Dashboard</span>
                         </a>
                     </li>
+                    <li style="display:none" class="{{ Request::is('users/'.Auth::id().'/edit') ? 'active' : '' }}" >
+                        <a href="{{ url('/users') }}">
+                            <i class="material-icons">perm_data_setting</i>
+                            <span>Users</span>
+                        </a>
+                    </li>
                     @if(auth::user()->user_type == 3)
                     <li class="{{ Request::is('users*') ? 'active' : '' }}" >
                         <a href="{{ url('/users') }}">
@@ -346,7 +352,7 @@
                     </li>
                     @endif
                     @if(auth::user()->user_type == 1)
-                    <li class="{{ Request::is('companies*', 'workshops*', 'designations*', 'expense-categories*', 'users*', 'taxes*', 'descriptions*', 'locations*', 'expense-categories*', 'purchase-categories*', 'asset-categories*', 'subassets') ? 'active' : '' }}">
+                    <li class="{{ Request::is('companies*', 'workshops*', 'designations*', 'expense-categories*', 'users*', 'taxes*', 'descriptions*', 'locations*', 'banks*', 'vendors*', 'expense-categories*', 'purchase-categories*', 'asset-categories*', 'subassets*') ? 'active' : '' }}">
                         <a href="javascript:void(0); " class="menu-toggle">
                             <i class="material-icons">perm_data_setting</i>
                             <span>Manage</span>
@@ -367,11 +373,6 @@
                                     <span>Users</span>
                                 </a>
                             </li>
-                            <!-- <li class="{{ Request::is('locations*') ? 'active' : '' }}" >
-                                <a href="{{ url('/locations') }}">
-                                    <span>Locations</span>
-                                </a>
-                            </li> -->
                             <li class="{{ Request::is('designations*') ? 'active' : '' }}" >
                                 <a href="{{ url('/designations') }}">
                                     <span>Designations</span>
@@ -382,11 +383,16 @@
                                     <span>Taxes</span>
                                 </a>
                             </li>
-                            <!-- <li class="{{ Request::is('descriptions*') ? 'active' : '' }}" >
-                                <a href="{{ url('/descriptions') }}">
-                                    <span>Descriptions</span>
+                            <li class="{{ Request::is('banks*') ? 'active' : '' }}" >
+                                <a href="{{ url('/banks') }}">
+                                    <span>Banks</span>
                                 </a>
-                            </li> -->
+                            </li>
+                            <li class="{{ Request::is('vendors*') ? 'active' : '' }}" >
+                                <a href="{{ url('/vendors') }}">
+                                    <span>Vendors</span>
+                                </a>
+                            </li>
                         	<li class="{{ Request::is('expense-categories*') ? 'active' : '' }}" >
                                 <a class="menu-toggle" >
                                     <span>Expense Categories</span>
@@ -402,30 +408,8 @@
                                             <span>Sub Category</span>
                                         </a>
                                     </li>
-                                    <!-- <li class="{{ Request::is('expense-categories/expense-category*') ? 'active' : '' }}" >
-                                        <a href="{{ url('expense-categories/expense-category') }} ">
-                                            <span>Expense Category</span>
-                                        </a>
-                                    </li> -->
                                 </ul>
                             </li>
-                            <!-- <li class="{{ Request::is('purchase-categories*') ? 'active' : '' }}" >
-                                <a class="menu-toggle">
-                                    <span>Purchase Categories</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li class="{{ Request::is('purchase-categories*') ? 'active' : '' }}" >
-                                        <a href="{{ url('/purchase-categories') }} ">
-                                            <span>Purchase</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ url('/subexpenses') }} ">
-                                            <span>Sub Purchase</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li> -->
                             <li class="{{ Request::is('asset-categories*', 'subassets*') ? 'active' : '' }}" >
                                 <a class="menu-toggle">
                                     <span>Asset Categories</span>
@@ -446,22 +430,26 @@
                         </ul>
                     </li>
                     @endif
-                    @if(auth::user()->user_type == 1 || auth::user()->user_type == 3 || auth::user()->user_type == 5)
-                    <li class="{{ Request::is('deposits*') ? 'active' : '' }}" >
+                    <li class="{{ Request::is('payment-history*') ? 'active' : '' }}" >
+                        <a href="{{ url('/payment-history') }}" >
+                            <i class="material-icons">receipt</i>
+                            <span>Payment History</span>
+                        </a>
+                    </li>
+                    @if(auth::user()->user_type != 5)
+                    <li class="{{ Request::is('deposits*', 'user-transactions*') ? 'active' : '' }}" >
                         <a href="{{ url('/deposits') }}" >
                             <i class="material-icons">account_balance</i>
-                            <span>Deposit</span>
+                            <span> @if(auth::user()->user_type == 4 ) Share My  @endif Deposit</span>
                         </a>
                     </li>
                     @endif
-                    @if(auth::user()->user_type == 4 )
-                    <li class="{{ Request::is('shared-balances*') ? 'active' : '' }}" >
-                        <a href="{{ url('shared-balances') }}" >
-                            <i class="material-icons">account_balance</i>
-                            <span>Share My Balance</span>
+                    <li class="{{ Request::is('cheques*') ? 'active' : '' }}" >
+                        <a href="{{ url('/cheques') }}" >
+                            <i class="material-icons">account_balance_wallet</i>
+                            <span>Deposit Cheque</span>
                         </a>
                     </li>
-                    @endif
                     <li class="{{ Request::is('expenses*') ? 'active' : '' }}" >
                         <a href="{{ url('/expenses') }}" >
                             <i class="material-icons">account_balance_wallet</i>

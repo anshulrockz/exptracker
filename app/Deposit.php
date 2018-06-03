@@ -38,28 +38,27 @@ class Deposit extends Model
 				->get();
 		}
 
-        	/*if($user_type == 3){
-			return DB::table('deposits')
-			->select('deposits.*', 'users.name as user')
-			->where([
-					['deposits.deleted_at',null],
-					['users.workshop_id', $workshop],
-					//['deposits.to_user', $id],
-					//['users.id', $id]
-						])
-	            ->leftJoin('users', 'users.id', '=', 'deposits.to_user')
-				->get();
-		}*/
-
-		else{
+       	if($user_type == 3){
 			return DB::table('deposits')
 				->select('deposits.*', 'users.name as user')
 				->where([
 				['deposits.deleted_at',null],
-					//['deposits.to_user', $id],
-					['users.workshop_id', $workshop],
+				['deposits.created_by', $id],
+				['users.workshop_id', $workshop],
 				])
 	            ->leftJoin('users', 'users.id', '=', 'deposits.to_user')
+	            ->get();
+		}
+
+		else{
+			return DB::table('user_deposits')
+				->select('user_deposits.*')//,  DB::raw('SUM( user_deposits.amount - (expense_details.cost*expense_details.quantity) - expense_details.sgst - expense_details.cgst - expense_details.igst ) as rem_amount'))
+				->where([
+						['user_deposits.deleted_at',null],
+						['user_deposits.created_by', $id],
+						])
+	            // ->leftJoin('expenses', 'expenses.created_for', '=', 'user_deposits.to_user')
+	            // ->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
 	            ->get();
 		}
 	}
@@ -88,6 +87,13 @@ class Deposit extends Model
 		$workshop = Auth::user()->workshop_id;
 		$id = Auth::user()->id;
 		$user_type = Auth::user()->user_type;
+		
+		if(isset($_GET['location']))
+		{
+			$company = Auth::user()->company_id;
+			$workshop = $_GET['location'];
+			$user_type = 3;
+		}
 
 		if($user_type == 1  || $user_type == 5){
 			return DB::table('deposits')
@@ -153,5 +159,38 @@ class Deposit extends Model
 				)
 				->groupBy('y', 'm')
 				->get();
+	}
+	
+	public static function payeeBalance($nameofpayee)
+	{
+		$deposits = DB::table('user_deposits')
+			->select(DB::raw('sum(amount) as amt'))
+			->where([
+			['user_deposits.to_user',$nameofpayee],
+			['user_deposits.deleted_at',null]
+			])
+            ->first();
+
+      	$user_returns = DB::table('user_returns')
+			->select(DB::raw('sum(amount) as amt'))
+			->where([
+			['user_returns.by_user',$nameofpayee],
+			['user_returns.deleted_at',null]
+			])
+            ->first();
+        
+        $expenses = DB::table('expenses')
+			->select(DB::raw('SUM(expense_details.cost*expense_details.quantity) as cost'), DB::raw('SUM(expense_details.quantity) as quantity'), DB::raw('SUM(expense_details.sgst) as sgst'), DB::raw('SUM(expense_details.cgst) as cgst'), DB::raw('SUM(expense_details.igst) as igst') )
+			->where([
+					['expenses.created_for',$nameofpayee],
+					['expenses.status',1],
+					['expenses.deleted_at',null],
+					['expense_details.deleted_at',null]
+					])
+            ->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
+            ->first();
+
+    	return $deposits->amt - $user_returns->amt - $expenses->cost - $expenses->sgst - $expenses->cgst - $expenses->igst; 
+         
 	}
 }

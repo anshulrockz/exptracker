@@ -92,7 +92,6 @@ class Expense extends Model
 	
     public static function balance($id)
 	{
-		//$id = Auth::user()->id;
 		$deposits = DB::table('deposits')
 			->select(DB::raw('sum(amount) as amt'))
 			->where([
@@ -100,43 +99,38 @@ class Expense extends Model
 			['deposits.deleted_at',null]
 			])
             ->first();
+
+      	$user_deposits = DB::table('user_deposits')
+			->select(DB::raw('sum(amount) as amt'))
+			->where([
+			['user_deposits.created_by',$id],
+			['user_deposits.deleted_at',null]
+			])
+            ->first();
             
+        $user_returns = DB::table('user_returns')
+			->select(DB::raw('sum(amount) as amt'))
+			->where([
+			['user_returns.created_by',$id],
+			['user_returns.deleted_at',null]
+			])
+            ->first();
+        
         $expenses = DB::table('expenses')
 			->select(DB::raw('SUM(expense_details.cost*expense_details.quantity) as cost'), DB::raw('SUM(expense_details.quantity) as quantity'), DB::raw('SUM(expense_details.sgst) as sgst'), DB::raw('SUM(expense_details.cgst) as cgst'), DB::raw('SUM(expense_details.igst) as igst') )
 			->where([
 			['expenses.created_by',$id],
+			['expenses.created_for',null],
+			['expenses.paid_by',$id],
+			['expenses.paid_in',1],
 			['expenses.status',1],
 			['expenses.deleted_at',null],
 			['expense_details.deleted_at',null]
 			])
             ->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
             ->first();
-        	return $deposits->amt - $expenses->cost - $expenses->sgst - $expenses->cgst - $expenses->igst; 
-         
-	}
 
-	public static function shared_balance($id)
-	{
-		//$id = Auth::user()->id;
-		$deposits = DB::table('shared_balances')
-			->select(DB::raw('sum(amount) as amt'))
-			->where([
-			['shared_balances.to_user',$id],
-			['shared_balances.deleted_at',null]
-			])
-            ->first();
-            
-        $expenses = DB::table('expenses')
-			->select(DB::raw('SUM(temp_expense_details.cost*temp_expense_details.quantity) as cost'), DB::raw('SUM(temp_expense_details.quantity) as quantity'), DB::raw('SUM(temp_expense_details.sgst) as sgst'), DB::raw('SUM(temp_expense_details.cgst) as cgst'), DB::raw('SUM(temp_expense_details.igst) as igst') )
-			->where([
-			['expenses.created_by',$id],
-			['expenses.status',1],
-			['expenses.deleted_at',null],
-			['temp_expense_details.deleted_at',null]
-			])
-            ->leftJoin('temp_expense_details', 'temp_expense_details.expense_id', '=', 'expenses.id')
-            ->first();
-        	return $deposits->amt - $expenses->cost - $expenses->sgst - $expenses->cgst - $expenses->igst; 
+    	return $deposits->amt  + $user_returns->amt - $user_deposits->amt - $expenses->cost - $expenses->sgst - $expenses->cgst - $expenses->igst; 
          
 	}
 	
@@ -146,6 +140,21 @@ class Expense extends Model
 		$workshop = Auth::user()->workshop_id;
 		$id = Auth::user()->id;
 		$user_type = Auth::user()->user_type;
+
+		if(isset($_GET['company']) && isset($_GET['location']))
+		{
+			$company = Auth::user()->company_id;
+			$workshop = Auth::user()->workshop_id;
+			$id = Auth::user()->id;
+			$user_type = Auth::user()->user_type;
+		}
+
+		elseif(isset($_GET['location']))
+		{
+			$company = Auth::user()->company_id;
+			$workshop = $_GET['location'];
+			$user_type = 3;
+		}
 
 		if($user_type == 1  || $user_type == 5){
 		
@@ -185,9 +194,13 @@ class Expense extends Model
 				->select( DB::raw('YEAR(expenses.invoice_date) AS y'), DB::raw('MONTH(expenses.invoice_date) AS m'), DB::raw('SUM(cost*quantity) as cost'), DB::raw('SUM(sgst) as sgst'), DB::raw('SUM(cgst) as cgst'), DB::raw('SUM(igst) as igst') )
 				->where( [
 							[DB::raw('YEAR(expenses.invoice_date)'), "=","2018"],
-							['expense_details.deleted_at', null],
-							['expenses.deleted_at', null],
-							['expenses.status', 1],['expenses.created_by', $id]
+							['expenses.created_by',$id],
+                			['expenses.created_for',null],
+                			['expenses.paid_by',$id],
+                			['expenses.paid_in',1],
+                			['expenses.status',1],
+                			['expenses.deleted_at',null],
+                			['expense_details.deleted_at',null]
 							])
 		        ->leftJoin('users', 'users.id', '=', 'expenses.invoice_date')
 		  		->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
@@ -205,6 +218,13 @@ class Expense extends Model
 		$id = Auth::user()->id;
 		$user_type = Auth::user()->user_type;
 
+		if(isset($_GET['location']))
+		{
+			$company = Auth::user()->company_id;
+			$workshop = $_GET['location'];
+			$user_type = 3;
+		}
+
 		if($user_type == 1){
 			return DB::table('expenses')
 				->select( "expense_details.category1", "expense_details.category2", "expense_details.category3", DB::raw('SUM(expense_details.cost*expense_details.quantity) as cost'), DB::raw('SUM(expense_details.quantity) as quantity'), DB::raw('SUM(expense_details.sgst) as sgst'), DB::raw('SUM(expense_details.cgst) as cgst'), DB::raw('SUM(expense_details.igst) as igst') )
@@ -248,55 +268,4 @@ class Expense extends Model
 				->get();
 		}
 	}
-
-	public static function expenseTotal()
-	{
-		$company = Auth::user()->company_id;
-		$workshop = Auth::user()->workshop_id;
-		$id = Auth::user()->id;
-		$user_type = Auth::user()->user_type;
-
-		if($user_type == 1){
-			return DB::table('expenses')
-				->select( DB::raw('SUM(expense_details.cost*expense_details.quantity) as cost'), DB::raw('SUM(expense_details.quantity) as quantity'), DB::raw('SUM(expense_details.sgst) as sgst'), DB::raw('SUM(expense_details.cgst) as cgst'), DB::raw('SUM(expense_details.igst) as igst') )
-				->where([
-						['expenses.deleted_at',null],
-						['expenses.status',1],
-						['expense_details.deleted_at',null]
-						])
-	            ->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
-				->first();
-		}
-		
-		if($user_type == 3){
-			return DB::table('expenses')
-				->select( "expense_details.category1", "expense_details.category2", "expense_details.category3", DB::raw('SUM(expense_details.cost*expense_details.quantity) as cost'), DB::raw('SUM(expense_details.quantity) as quantity'), DB::raw('SUM(expense_details.sgst) as sgst'), DB::raw('SUM(expense_details.cgst) as cgst'), DB::raw('SUM(expense_details.igst) as igst') )
-				->where([
-						['expenses.deleted_at',null],
-						['expenses.status',1],
-						['expense_details.deleted_at',null],
-					    	['users.workshop_id', $workshop]
-						])
-	            ->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
-	            ->leftJoin('users', 'users.id', '=', 'expense_details.created_by')
-				->groupBy('category3')
-				->first();
-		}
-
-		else{
-			return DB::table('expenses')
-				->select( "expense_details.category1", "expense_details.category2", "expense_details.category3", DB::raw('SUM(expense_details.cost*expense_details.quantity) as cost'), DB::raw('SUM(expense_details.quantity) as quantity'), DB::raw('SUM(expense_details.sgst) as sgst'), DB::raw('SUM(expense_details.cgst) as cgst'), DB::raw('SUM(expense_details.igst) as igst') )
-				->where([
-						['expenses.deleted_at',null],
-						['expenses.status',1],
-						['expense_details.deleted_at',null],
-					    ['users.id', $id]
-						])
-	            ->leftJoin('expense_details', 'expense_details.expense_id', '=', 'expenses.id')
-	            ->leftJoin('users', 'users.id', '=', 'expense_details.created_by')
-				->groupBy('category3')
-				->first();
-		}
-	}
-
 }

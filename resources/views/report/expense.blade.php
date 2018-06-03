@@ -133,7 +133,7 @@
                                 <td>{{ $list->party_name}}</td>
                                 <td>{{ $list->party_gstin}}</td>
                                 <td>
-                                    @if($list->mode==1) Cash
+                                    @if($list->paid_in==1) Cash
                                     @else Credit
                                     @endif
                                 </td>
@@ -155,8 +155,12 @@
                                 <td>{{ $list->sgst }}</td>
                                 <td>{{ $list->cgst }}</td>
                                 <td>{{ $list->igst }}</td>
-                                <td>{{ ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst }}</td>
-                                <td>{{ $list->user }}</td>
+                                <td>
+                                    @if($list->round_off==1) {{round( ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst,0)}} 
+                                    @else {{ ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst }} 
+                                    @endif {{ ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst }}
+                                </td>
+                                <td>{{ $list->user}} @if(!empty($list->created_for)) ({{$list->created_for}}) @endif </td>
                                 <td>
                                     @if($list->status==1) Active
                                     @else Cancelled

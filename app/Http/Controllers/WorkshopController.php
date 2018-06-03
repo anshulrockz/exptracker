@@ -22,16 +22,22 @@ class WorkshopController extends Controller
     
     public function index()
     {
-        if(Auth::user()->user_type==1)
-    	{
-	        $workshop = Workshop::AllWorkshops();
-	        return view('workshop.index')->with('workshop',$workshop);
+    	try{
+	        if(Auth::user()->user_type==1)
+	    	{
+		        $workshop = Workshop::AllWorkshops();
+		        return view('workshop.index')->with('workshop',$workshop);
+			}
+			
+			if(Auth::user()->user_type > 1)
+	    	{
+				$workshop = Workshop::find( Auth::user()->workshop_id);
+		        return view('workshop.show')->with('workshop',$workshop);
+			}
 		}
-		
-		if(Auth::user()->user_type > 1)
-    	{
-			$workshop = Workshop::find( Auth::user()->workshop_id);
-	        return view('workshop.show')->with('workshop',$workshop);
+		catch(\Exception $e){
+		    $error = $e->getMessage();
+		    return back()->with('error', 'Something went wrong!'.$error);
 		}
     }
 
@@ -42,8 +48,14 @@ class WorkshopController extends Controller
      */
     public function create()
     {
-        $company = Company::all();
-        return view('workshop.create')->with('company',$company);
+    	try{
+	        $company = Company::all();
+	        return view('workshop.create')->with('company',$company);
+	    }
+		catch(\Exception $e){
+		    $error = $e[0]->getMessage();
+		    return back()->with('error', 'Something went wrong! '.$error);
+		}
     }
 
     /**
@@ -54,37 +66,44 @@ class WorkshopController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-			'company'=>'required|max:255',
-			'name'=>'required|max:255',
-			'code'=>'required|max:255',
-		]);
-		
-		$workshop = new Workshop;
-		$workshop->company = $request->company;
-		$workshop->name = $request->name;
-		$workshop->code = $request->code;
-		$workshop->reg_no = $request->reg_no;
-		$workshop->mobile = $request->mobile;
-		$workshop->phone = $request->phone;
-		$workshop->email = $request->email;
-		$workshop->address = $request->address;
-		$workshop->gst = $request->gst;
-		if ($request->location_type == "other") {
-			$workshop->location_type = $request->other;
+    	$this->validate($request,[
+				'company'=>'required|max:255',
+				'name'=>'required|max:255',
+				'code'=>'required|max:255',
+			]);
+
+    	try{
+			$workshop = new Workshop;
+			$workshop->company = $request->company;
+			$workshop->name = $request->name;
+			$workshop->code = $request->code;
+			$workshop->reg_no = $request->reg_no;
+			$workshop->mobile = $request->mobile;
+			$workshop->phone = $request->phone;
+			$workshop->email = $request->email;
+			$workshop->address = $request->address;
+			$workshop->gst = $request->gst;
+			$workshop->abc = $request->gst;
+			if ($request->location_type == "other") {
+				$workshop->location_type = $request->other;
+			}
+			else $workshop->location_type = $request->location_type;
+			$workshop->user_sys = \Request::ip();
+			$workshop->updated_by = Auth::id();
+			$workshop->created_by = Auth::id();
+			
+			$result = $workshop->save();
+			
+			if($result){
+				return back()->with('success', 'Record added successfully!');
+			}
+			else{
+				return back()->with('error', 'Something went wrong!');
+			}
 		}
-		else $workshop->location_type = $request->location_type;
-		$workshop->user_sys = \Request::ip();
-		$workshop->updated_by = Auth::id();
-		$workshop->created_by = Auth::id();
-		
-		$result = $workshop->save();
-		
-		if($result){
-			return back()->with('success', 'Record added successfully!');
-		}
-		else{
-			return back()->with('error', 'Something went wrong!');
+		catch(\Exception $e){
+			$error = $e->getMessage();
+		    return back()->with('error', 'Something went wrong! Please contact admin');
 		}
     }
 
@@ -96,15 +115,27 @@ class WorkshopController extends Controller
      */
     public function show($id)
     {
-    	$workshop = Workshop::find($id);
-        return view('workshop.show')->with('workshop',$workshop);
+    	try{
+	    	$workshop = Workshop::find($id);
+	        return view('workshop.show')->with('workshop',$workshop);
+    	}
+    	catch(\Exception $e){
+			$error = $e->getMessage();
+		    return back()->with('error', 'Something went wrong! Please contact admin');
+		}
     }
 
     public function edit($id)
     {
-    	$company = Company::all();
-        $workshop = Workshop::find($id);
-        return view('workshop.edit')->with( array('workshop' => $workshop,'company' => $company ));
+    	try{
+	    	$company = Company::all();
+	        $workshop = Workshop::find($id);
+	        return view('workshop.edit')->with( array('workshop' => $workshop,'company' => $company ));
+	    }
+    	catch(\Exception $e){
+			$error = $e->getMessage();
+		    return back()->with('error', 'Something went wrong! Please contact admin');
+		}
     }
 
     public function update(Request $request, $id)
@@ -114,59 +145,76 @@ class WorkshopController extends Controller
 			'name'=>'required|max:255',
 			'code'=>'required|max:255',
 		]);
-		
-		$workshop = Workshop::find($id);
-		$workshop->company = $request->company;
-		$workshop->name = $request->name;
-		$workshop->code = $request->code;
-		$workshop->reg_no = $request->reg_no;
-		$workshop->mobile = $request->mobile;
-		$workshop->phone = $request->phone;
-		$workshop->email = $request->email;
-		$workshop->address = $request->address;
-		$workshop->gst = $request->gst;
-		if ($request->location_type == "other") {
-			$workshop->location_type = $request->other;
+		try{
+			$workshop = Workshop::find($id);
+			$workshop->company = $request->company;
+			$workshop->name = $request->name;
+			$workshop->code = $request->code;
+			$workshop->reg_no = $request->reg_no;
+			$workshop->mobile = $request->mobile;
+			$workshop->phone = $request->phone;
+			$workshop->email = $request->email;
+			$workshop->address = $request->address;
+			$workshop->gst = $request->gst;
+			if ($request->location_type == "other") {
+				$workshop->location_type = $request->other;
+			}
+			else $workshop->location_type = $request->location_type;
+			$workshop->user_sys = \Request::ip();
+			$workshop->updated_by = Auth::id();
+			$workshop->created_by = Auth::id();
+			
+			$result = $workshop->save();
+			
+			if($result){
+				return back()->with('success', 'Record added successfully!');
+			}
+			else{
+				return back()->with('error', 'Something went wrong!');
+			}
 		}
-		else $workshop->location_type = $request->location_type;
-		$workshop->user_sys = \Request::ip();
-		$workshop->updated_by = Auth::id();
-		$workshop->created_by = Auth::id();
-		
-		$result = $workshop->save();
-		
-		if($result){
-			return back()->with('success', 'Record added successfully!');
-		}
-		else{
-			return back()->with('error', 'Something went wrong!');
+    	catch(\Exception $e){
+			$error = $e->getMessage();
+		    return back()->with('error', 'Something went wrong! Please contact admin');
 		}
     }
 
     public function destroy($id)
     {
-        $count = User::all()->where('workshop_id',$id)->count();
-        
-        if($count==0){
-			$workshop = Workshop::find($id);
-        	$result = $workshop->delete($id);
-		
-	        if($result){
-				return redirect()->back()->with('success', 'Record deleted successfully!');
+    	try{
+	        $count = User::all()->where('workshop_id',$id)->count();
+	        
+	        if($count==0){
+				$workshop = Workshop::find($id);
+	        	$result = $workshop->delete($id);
+			
+		        if($result){
+					return redirect()->back()->with('success', 'Record deleted successfully!');
+				}
+				else{
+					return redirect()->back()->with('error', 'Something went wrong!');
+				}
 			}
 			else{
-				return redirect()->back()->with('error', 'Something went wrong!');
+					return redirect()->back()->with('error', 'You cannot delete the workshop because users exist in workshop');
 			}
 		}
-		else{
-				return redirect()->back()->with('error', 'You cannot delete the workshop because users exist in workshop');
-			}
+    	catch(\Exception $e){
+			$error = $e->getMessage();
+		    return back()->with('error', 'Something went wrong! Please contact admin');
+		}
     }
     
     public function id_ajax(Request $request)
     {
-		$id = $request->id;
-		$workshop = Workshop::where('company',$id)->get();//->pluck('name','id');
-		print_r(json_encode($workshop));
+    	try{
+			$id = $request->id;
+			$workshop = Workshop::where('company',$id)->get();//->pluck('name','id');
+			print_r(json_encode($workshop));
+		}
+    	catch(\Exception $e){
+			$error = $e->getMessage();
+		    return back()->with('error', 'Something went wrong! Please contact admin');
+		}
 	}
 }

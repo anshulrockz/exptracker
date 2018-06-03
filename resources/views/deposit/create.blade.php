@@ -14,13 +14,14 @@ $(function(){
 	$("#company").change(function(){
 		var id = $(this).val();
 		if(id != ''){
+			$('#workshop option').remove();
 			$.ajax({
 				type: "GET",
 				url: "{{url('/workshops/ajax')}}",
 				data:'id='+id,
 				success: function(data){
 					var data = JSON.parse(data);
-					var selOpts = "";
+					var selOpts = "<option>select</option>";
 					if(data.length >0){					
 						console.log(data);
 			            for (i=0;i<data.length;i++)
@@ -42,13 +43,14 @@ $(function(){
 	$("#workshop").change(function(){
 		var id = $(this).val();
 		if(id != ''){
+			$('#name option').remove();
 			$.ajax({
 				type: "GET",
 				url: "{{url('/users/ajax')}}",
 				data:'id='+id,
 				success: function(data){
 					var data = JSON.parse(data);
-					var selOpts = "";
+					var selOpts = "<option>select</option>";
 					if(data.length >0){					
 						console.log(data);
 			            for (i=0;i<data.length;i++)
@@ -129,6 +131,11 @@ function paymentMode(mode){
                 <h2>
                     Details
                 </h2>
+                <b>
+	                @if(isset($balance))
+	                Balance({{$balance}})
+	                @endif
+                </b>
             </div>
             <div class="body">
                 <form method="post" action="{{route('deposits.store')}}">
@@ -170,6 +177,9 @@ function paymentMode(mode){
 		                    <label for="name">Payee</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
+		                        	@if(Auth::user()->user_type==4)
+			                            <input type="text" id="name" name="name" class="form-control " placeholder="Enter employee name">
+		                            @else
 		                            <select class="form-control show-tick" id="name" name="name" required>
 			                            <option value="">-- Please select employee name --</option>
 			                            @if(Auth::user()->user_type==3)
@@ -178,6 +188,7 @@ function paymentMode(mode){
 				                            @endforeach
 			                            @endif
 			                        </select>
+			                        @endif
 		                        </div>
 		                    </div>
 	                    </div>
