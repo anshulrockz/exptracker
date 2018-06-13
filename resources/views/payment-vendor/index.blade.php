@@ -12,13 +12,13 @@
         <div class="card">
         	<div class="header">
                 <h2>
-                    Deposit Cheque
+                    Deposit
                 </h2>
             </div>
             <div class="body">
                 <ol class="breadcrumb breadcrumb-bg-pink">
                     <li><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="active">Deposit Cheque</li>
+                    <li class="active">Deposit</li>
                 </ol>
             </div>
         </div>
@@ -38,7 +38,7 @@
                 <h2>
                     All
                 </h2>
-                <a class="btn btn-primary waves-effect header-dropdown m-r--5" href="{{ url('/cheques/create')}}">Deposit Cheque</a>
+                <a class="btn btn-primary waves-effect header-dropdown m-r--5" href="{{ route('payment-vendors/create')}}">Deposit Now</a>
             </div>
             <div class="body">
                 <div class="table-responsive">
@@ -64,7 +64,7 @@
                             </tr>
                         </tfoot>  -->
                         <tbody>
-                        	@foreach( $cheque as $key=>$list)
+                        	@foreach( $deposit as $key=>$list)
                             <tr>
                                 <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
                                 <td>{{date_format(date_create($list->date),"d/m/Y")}}</td>
@@ -78,12 +78,19 @@
                                 <td>@if(!empty($list->user)) {{$list->user}} @else {{$list->to_user}} @endif</td>
                                 <td>
                                     @if(Auth::user()->user_type==1 || Auth::user()->user_type==3)
-                                    <a href="{{ url('/cheques/'.$list->id.'/edit')}}" class="btn btn-xs btn-info"> <i class="material-icons">edit</i> </a>
-                                    <form style="display: inline;" method="post" action="{{route('cheques.destroy',$list->id)}}">
+                                    <a href="{{ url('/deposits/'.$list->id.'/edit')}}" class="btn btn-xs btn-info"> <i class="material-icons">edit</i> </a>
+                                    <form style="display: inline;" method="post" action="{{route('deposits.destroy',$list->id)}}">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
                                         <button onclick="return confirm('Are you sure you want to Delete?');" type="submit"class="btn btn-xs btn-danger"><i class="material-icons">delete</i></button>
                                     </form>
+                                    @endif
+                                    @if(Auth::user()->user_type==4)
+                                    <a href="{{ url('user-transactions/'.$list->to_user)}}" class="btn btn-xs btn-primary"> <i class="material-icons">assessment</i> </a>
+                                    <form style="display: inline;" method="post" action="{{url('deposits/return',$list->id)}}">
+				                        {{ csrf_field() }}
+				                        <button type="submit"class="btn btn-xs btn-primary"><i class="material-icons">assignment_late</i></button>
+				                    </form>
                                     @endif
                                 </td>
                             </tr>

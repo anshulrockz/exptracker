@@ -35,14 +35,26 @@ Route::get('user-deposit/payeebalance', 'DepositController@payeeBalance');
 Route::post('/deposits/return/{id}', 'DepositController@return');
 Route::resource('/deposits', 'DepositController');
 
-//cheques
-Route::resource('/cheques', 'ChequeController');
+//Payment Vendor
+Route::get('payment-vendors/ajax','PaymentVendorController@id_ajax');
+Route::post('/payment-vendors/return/{id}', 'PaymentVendorController@return');
+Route::resource('/payment-vendors', 'PaymentVendorController');
+
+//Payment Others
+Route::resource('payment/others', 'PaymentOtherController');
+Route::post('cheques/payment', 'PaymentOtherController@payment');
+Route::post('cheques/change-status', 'PaymentOtherController@changeStatus');
+
+//Payment NEFT
+Route::resource('payment/nefts', 'PaymentNeftController');
+Route::post('cashs/payment', 'PaymentNeftController@payment');
+Route::get('cashs/change-status/{id}', 'PaymentNeftController@changeStatus');
+
+//Payment History
+Route::resource('payment/history', 'PaymentHistoryController');
 
 //User Transaction
 Route::resource('user-transactions', 'UserTransactionController');
-
-//Payment History
-Route::resource('payment-history', 'PaymentHistoryController');
 
 //Expense
 Route::get('expenses/partyname', 'ExpenseController@partyname');
@@ -83,6 +95,7 @@ Route::group(['middleware' => 'CheckAdmin'], function() {
 	Route::get('/workshops/ajax','WorkshopController@id_ajax');
 
 	//Bank
+	Route::get('banks/ajax','BankController@id_ajax');
 	Route::resource('banks','BankController');
 
 	//Vendor

@@ -385,7 +385,7 @@
                             </li>
                             <li class="{{ Request::is('banks*') ? 'active' : '' }}" >
                                 <a href="{{ url('/banks') }}">
-                                    <span>Banks</span>
+                                    <span>Company Banks</span>
                                 </a>
                             </li>
                             <li class="{{ Request::is('vendors*') ? 'active' : '' }}" >
@@ -430,12 +430,6 @@
                         </ul>
                     </li>
                     @endif
-                    <li class="{{ Request::is('payment-history*') ? 'active' : '' }}" >
-                        <a href="{{ url('/payment-history') }}" >
-                            <i class="material-icons">receipt</i>
-                            <span>Payment History</span>
-                        </a>
-                    </li>
                     @if(auth::user()->user_type != 5)
                     <li class="{{ Request::is('deposits*', 'user-transactions*') ? 'active' : '' }}" >
                         <a href="{{ url('/deposits') }}" >
@@ -444,43 +438,48 @@
                         </a>
                     </li>
                     @endif
+                    <!-- <li class="{{ Request::is('cashs*') ? 'active' : '' }}" >
+                        <a href="{{ url('/cashs') }}" >
+                            <i class="material-icons">account_balance_wallet</i>
+                            <span>Deposit Cash</span>
+                        </a>
+                    </li>
                     <li class="{{ Request::is('cheques*') ? 'active' : '' }}" >
                         <a href="{{ url('/cheques') }}" >
                             <i class="material-icons">account_balance_wallet</i>
                             <span>Deposit Cheque</span>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="{{ Request::is('expenses*') ? 'active' : '' }}" >
                         <a href="{{ url('/expenses') }}" >
                             <i class="material-icons">account_balance_wallet</i>
                             <span>Expense</span>
                         </a>
                     </li>
-                    <!--<li>
+                    <li class="{{ Request::is('payment*') ? 'active' : '' }}">
                         <a href="javascript:void(0); " class="menu-toggle">
-                            <i class="material-icons">trending_down</i>
-                            <span>Expense</span>
+                            <i class="material-icons">business_center</i>
+                            <span>Payments</span>
                         </a>
                         <ul class="ml-menu">
-                        	<!--<li>
-                                <a href="javascript:void(0); " class="menu-toggle">
-                                    <span>Fuel</span>
+                            <li class="{{ Request::is('payment/others*') ? 'active' : '' }} ">
+                                <a href="{{ url('/payment/others') }}" >
+                                    <span>Cash/Cheque/Other</span>
                                 </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="{{ url('/fuel/cng') }} ">
-                                            <span>CNG</span>
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
-                            <li>
-                                <a href="{{ url('/expenses/create') }}">
-                                    <span>Expense</span>
+                            <li class="{{ Request::is('payment/neft*') ? 'active' : '' }} ">
+                                <a href="{{ url('/payment/nefts') }}" >
+                                    <span>NEFT</span>
                                 </a>
                             </li>
                         </ul>
-                    </li>-->
+                    </li>
+                    <li class="{{ Request::is('payment/history*') ? 'active' : '' }}" >
+                        <a href="{{ url('/payment/history') }}" >
+                            <i class="material-icons">receipt</i>
+                            <span>Payment History</span>
+                        </a>
+                    </li>
                     @if(auth::user()->user_type == 1 || auth::user()->user_type == 3 || auth::user()->user_type == 5)
                     <li class="{{ Request::is('assets*') ? 'active' : '' }}">
                         <a href="javascript:void(0); " class="menu-toggle">

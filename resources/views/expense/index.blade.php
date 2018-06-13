@@ -53,10 +53,11 @@
                         <thead>
                             <tr>
                                 <th>Voucher No</th>
-                                <th>Voucher Date</th>
+                                <th>Invoice No</th>
+                                <th>Invoice Date</th>
                                 <th>Seller Name</th>
                                 <th>Amount</th>
-                                <th>Payment</th>
+                                <!-- <th>Payment</th> -->
                                 <th>Booked By</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -65,25 +66,28 @@
                         <tbody>
                         	@foreach( $expense as $key=>$list)
                             <tr>
-                            	<td>{{ $list->voucher_no }}</td>
-                                <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
+                                <td>{{ $list->voucher_no }}</td>
+                            	<td>{{ $list->invoice_no }}</td>
+                                <td>{{date_format(date_create($list->invoice_date),"d/m/Y")}}</td>
                                 <td>{{$list->party_name}}</td>
                                 <td>
                                     @if($list->round_off==1) {{round($list->amount,0)}} @else {{$list->amount}} @endif
                                 </td>
-                                <td>
+                                <!-- <td>
                                     @if($list->mode==1 || $list->mode=='Cash') Paid
                                     @else Unpaid
                                         @if(Auth::user()->user_type == 1 || Auth::user()->user_type == 5 && $list->status == 1)
                                             <button type="button" class="js-modal-buttons btn btn-default btn-xs  waves-effect m-r-20" data-id="{{$list->voucher_no}}" data-amount="{{$list->amount}}" data-toggle="modal" ><i class="material-icons">attach_money</i></button> 
                                         @endif
                                     @endif
-                                </td>
+                                </td> -->
                                 <td>{{$list->user}}</td>
                                 <td>
                                 	@if($list->status==1) Active
                                 	@else Cancelled
                                 	@endif
+                                    @if($list->mode==1 || $list->mode=='Cash') (Paid)
+                                    @endif
                                 </td>
                                 <td>
                                     <!-- <a href="{{ url('/expenses/'.$list->id)}}" class="btn btn-xs btn-success"> View </a> -->

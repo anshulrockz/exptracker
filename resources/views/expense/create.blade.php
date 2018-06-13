@@ -338,7 +338,7 @@ $(document).ready(function() {
 	                		<label for="voucher_no">Voucher No.(auto)</label>
 		                    <div class="form-group form-float">
 		                        <div class="form-line ">
-		                            <input type="text" id="voucher_no" name="voucher_no" class="form-control" placeholder="Enter voucher number" value="{{ $voucher_no }}" disabled>
+		                            <input type="text" id="voucher_no" name="voucher_no" class="form-control" placeholder="Enter voucher number" value="{{ $voucher_no }}" readonly>
 		                        </div>
 		                    </div>
 	                    </div>
@@ -346,7 +346,7 @@ $(document).ready(function() {
 		                    <label for="voucher_date">Voucher Date</label>
 		                    <div class="form-group form-float">
 		                        <div class="form-line ">
-		                            <input type="text" id="voucher_date" name="voucher_date" class="form-control" placeholder="Enter Date Of voucher" value="{{  date('d F Y') }}" disabled>
+		                            <input type="text" id="voucher_date" name="voucher_date" class="form-control" placeholder="Enter Date Of voucher" value="{{  date('d F Y') }}" readonly>
 		                        </div>
 		                    </div>
 	                    </div>
@@ -367,6 +367,19 @@ $(document).ready(function() {
 		                    </div>
 	                    </div>
 	                    <div class="col-sm-6 ">
+		                    <label for="vendor_id">Vendor Name</label>
+		                    <div class="form-group">
+			                    <div class="form-line">
+			                        <select class="form-control show-tick" id="vendor_id" name="vendor_id" required>
+			                            <option value="" >-- Please select Vendor --</option>
+			                            @foreach($vendor as $list)
+			                            <option value="{{$list->id}}">{{$list->name}}  ({{$list->gst}})</option>
+			                            @endforeach
+			                        </select>
+		                    	</div>
+	                    	</div>
+	                    </div>
+	                    <!-- <div class="col-sm-6 ">
 		                    <label for="party_name">Seller Name</label>
 		                    <div class="form-group form-float">
 		                        <div class="form-line ">
@@ -381,7 +394,7 @@ $(document).ready(function() {
 		                            <input type="text" id="party_gstin" name="party_gstin" class="form-control" placeholder="Enter seller gstin " value="{{ old('party_gstin') }}" >
 		                        </div>
 		                    </div>
-	                    </div>
+	                    </div> -->
 	                    <div class="col-sm-3">
 		                    <label for="mode">Mode Of Payment</label>
 		                    <div class="form-group">
@@ -397,7 +410,7 @@ $(document).ready(function() {
 		                    <label for="location">Location</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                            <select class="form-control show-tick" id="location" name="location" @if(Auth::user()->user_type != 5) disabled @endif>
+		                            <select class="form-control show-tick" id="location" name="location" @if(Auth::user()->user_type == 3 || Auth::user()->user_type == 4) disabled @endif>
 			                            <option >select</option>
 			                            @foreach($workshop as $list)
 			                            <option value="{{$list->id}}" @if(Auth::user()->workshop_id == $list->id) selected @endif >{{$list->name}}</option>
@@ -407,7 +420,7 @@ $(document).ready(function() {
 		                    </div>
 	                    </div>
 	                    <div class="col-sm-3 ">
-		                    <label for="voucher_img">Upload Invoice</label>
+		                    <label for="voucher_img">Upload Document</label>
 		                    <div class="form-group form-float">
 		                        <div class="form-line ">
 	                                <div class="fallback">

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Vendor;
+use App\State;
+use App\Workshop;
 use Auth;
 
 class VendorController extends Controller
@@ -21,21 +23,49 @@ class VendorController extends Controller
     
     public function create()
     {
-        return view('vendor.create');
+    	$state = State::orderBy('name')->get();
+    	$location = Workshop::orderBy('name')->get();
+
+    	$voucher_no = Vendor::lastid('vendors');
+    	if(empty($voucher_no)) $voucher_no == 0;
+    	else $voucher_no = $voucher_no->id;
+    	$voucher_no = $voucher_no + 1;
+    	$voucher_no = 'VEN_'.date('y').sprintf("%03d", $voucher_no);
+
+        return view('vendor.create')->with(array('state' => $state, 'location' => $location, 'voucher_no' => $voucher_no, ));
     }
 
     public function store(Request $request)
     {
         $this->validate($request,[
 			'name'=>'required|max:255',
+			'email'=>'required|max:255',
+			'gstin'=>'required',
+			'acc_no'=>'numeric'
 		]);
 		
 		$vendor = new Vendor;
+
+		if(Auth::user()->user_type == 3 || Auth::user()->user_type == 4)
+		$request->location = Auth::user()->workshop_id;
+		
+		if(!empty($request->file('doc_img')))
+		{
+			$image = $request->file('doc_img');
+			$image_name = time().'.'.$image->getClientOriginalExtension();
+			$image->move(public_path('uploads/vendor/'), $image_name);
+		    $vendor->doc_img = $image_name;
+		}
+
+		$vendor->uid = $request->uid;
 		$vendor->name = $request->name;
-		$vendor->gst = $request->gst;
-		$vendor->state = $request->state;
+		$vendor->gst = $request->gstin;
+		$vendor->contact_person = $request->contact_person;
+		$vendor->pan = $request->pan;
 		$vendor->state_code = $request->state_code;
+		$vendor->email = $request->email;
 		$vendor->mobile = $request->mobile;
+		$vendor->location = $request->location;
 		$vendor->address = $request->address;
 		$vendor->bank_name = $request->bank_name;
 		$vendor->acc_no = $request->acc_no;
@@ -72,18 +102,31 @@ class VendorController extends Controller
     {
         $this->validate($request,[
 			'name'=>'required|max:255',
-			'contact_person'=>'required|max:255',
-			'mobile'=>'required|max:255',
-			'cin'=>'required|max:255',
-			'email'=>'required|max:255'
+			'email'=>'required|max:255',
+			'acc_no'=>'numerics'
 		]);
+
+		$vendor = Vendor::find($id); 
 		
-		$vendor = Vendor::find($id);
+		if(Auth::user()->user_type == 3 || Auth::user()->user_type == 4)
+		$request->location = Auth::user()->workshop_id;
+
+		if(!empty($request->file('doc_img')))
+		{
+			$image = $request->file('doc_img');
+			$image_name = time().'.'.$image->getClientOriginalExtension();
+			$image->move(public_path('uploads/vendor/'), $image_name);
+		    $vendor->doc_img = $image_name;
+		}
+
 		$vendor->name = $request->name;
-		$vendor->gst = $request->gst;
-		$vendor->state = $request->state;
+		$vendor->gst = $request->gstin;
+		$vendor->contact_person = $request->contact_person;
+		$vendor->pan = $request->pan;
 		$vendor->state_code = $request->state_code;
+		$vendor->email = $request->email;
 		$vendor->mobile = $request->mobile;
+		$vendor->location = $request->location;
 		$vendor->address = $request->address;
 		$vendor->bank_name = $request->bank_name;
 		$vendor->acc_no = $request->acc_no;
