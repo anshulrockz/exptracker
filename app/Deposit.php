@@ -18,6 +18,11 @@ class Deposit extends Model
         return $this->hasOne('App\User', 'id','to_user');
     }
     
+	public static function lastid()
+	{
+		return DB::table('deposits')->orderBy('id', 'desc')->first();
+	}
+
     public static function all_deposits()
 	{
 		$company = Auth::user()->company_id;

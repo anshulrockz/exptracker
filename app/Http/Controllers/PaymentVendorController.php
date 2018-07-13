@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\PaymentVendor;
 use App\Vendor;
+use App\Bank;
 use App\Transaction;
 use App\Company;
 use App\Workshop;
@@ -24,53 +25,33 @@ class PaymentVendorController extends Controller
     
     public function index()
     {
-    	$deposit = PaymentVendor::all_deposits(); //->where('created_by',Auth::id());
-    
-        /*if(Auth::user()->user_type==2)
-    	{
-	    	$deposit = PaymentVendor::workshop_deposits();
-	        return view('payment-vendor.index')->with('deposit',$deposit);
-        }*/
-        
-        if(Auth::user()->user_type==3)
-    	{
-	    	$deposit = PaymentVendor::workshop_deposits();
-	        return view('payment-vendor.index')->with('deposit',$deposit);
-        }
-        
-    	$deposit = PaymentVendor::all_deposits();
-        return view('payment-vendor.index')->with('deposit',$deposit);
-    
-    
-        return view('payment-vendor.index')->with('deposit',$deposit);    	
+    	$deposit = Transaction::all_details(); 
+    	return view('payment-vendor.index')->with('deposit',$deposit);  	
     }
 
     public function create()
     {
-    	try{
-    		if(Auth::user()->user_type==1 || Auth::user()->user_type==5)
-	    	{
-	    		$companies = Company::all();
-	        	return view('payment-vendor.create')->with('companies',$companies);
-			}
-			
-	    	if(Auth::user()->user_type==3)
-	    	{
-	    		$users = Bank::all()->where('workshop_id',Auth::user()->workshop_id)->where('user_type','!=',1)->where('id','!=',Auth::id());
-	    		return view('payment-vendor.create')->with('users',$users);
-			}
+    	$voucher_no = PaymentVendor::lastid();
+    	if(empty($voucher_no)) $voucher_no == 0;
+    	else $voucher_no = $voucher_no->id;
+    	$voucher_no = $voucher_no + 1;
+    	$voucher_no = 'PLS_PAY_'.sprintf("%04d", $voucher_no);
 
-			if(Auth::user()->user_type==4)
-	    	{
-	    		$balance = Expense::balance(Auth::id());
-				$users = Bank::all()->where('workshop_id',Auth::user()->workshop_id)->where('user_type',4)->where('id','!=',Auth::id());
-	    		return view('payment-vendor.create')->with(array('users' => $users, 'balance' => $balance ));
-			}
-		}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
-		}
+    	$bank = Bank::all();
+
+    	if (isset($_GET['id'])) {
+			$vendor_id = $_GET['id'];
+    		$vendor = Vendor::where('id',$vendor_id)->get();
+    	}
+    	elseif (Auth::user()->user_type == 1 || Auth::user()->user_type == 5) {
+    		$vendor = Vendor::all();
+    	}
+    	else{
+    		$vendor = Vendor::where('location', Auth::user()->workshop_id)->get();;
+    	}
+
+    	return view('payment-vendor.create')->with(array('vendor' => $vendor, 'voucher_no' => $voucher_no, 'bank' => $bank, ));
+        
     }
 
     /**
@@ -90,98 +71,66 @@ class PaymentVendorController extends Controller
 			'mode'=>'required|max:255',
 		]);
 		
-		try{
-			$deposit = new PaymentVendor;
+		$formInfo = new PaymentVendor;
 
-			if(Auth::user()->user_type==4)
-	    	{
-	    		$balance = Expense::balance(Auth::id());
-		    	if($balance < $request->amount){
-		    	    return back()->with('warning', 'Request failed! Amount cannot be greater than balance.');
-		    	}
-
-				$deposit = new BankPaymentVendor;
-			}
-
-			$mode = $request->mode;
-			
-			if($mode == 2)
-			{
-				//$date = $request->txn_date;
-				//$deposit->txn_date = date_format(date_create($date),"Y-m-d");
-				$deposit->txn_no = $request->txn_no;
-			}
-			
-			elseif($mode == 3)
-			{
-				$deposit->txn_no = $request->txn_no;
-				$deposit->acc_no = $request->acc_no;
-				$deposit->ifsc = $request->ifsc;
-			}
-			
-			$date = $request->date;
-			$deposit->date = date_format(date_create($date),"Y-m-d");
-			$deposit->to_user = $request->name;
-			$deposit->amount = $request->amount;
-			$deposit->mode = $request->mode;
-			$deposit->remark = $request->remarks;
-			$deposit->user_sys = \Request::ip();
-			$deposit->updated_by = Auth::id();
-			$deposit->created_by = Auth::id();
-			$result = $deposit->save();
-			
-			$id = $deposit->id;
-
-			if(Auth::user()->user_type==4)
-	    	{
-				$deposit = BankPaymentVendor::find($id);
-			}
-			else
-				$deposit = PaymentVendor::find($id);
-
-			$deposit->txn_id = 'DPO'.$id;
-			$result = $deposit->save();
-			
-			//trans table
-			if(Auth::user()->user_type==4){
-				$transaction = new BankTransaction;
-				$transaction->txn_type = 1;
-				$transaction->voucher_no = $deposit->txn_id;
-				$transaction->credit = $request->amount;
-				$transaction->balance = PaymentVendor::payeeBalance($request->name);
-				$transaction->created_for = $request->name;
-				$transaction->user_sys = \Request::ip();
-				$transaction->updated_by = Auth::id();
-				$transaction->created_by = Auth::id();
-				$transaction->particulars = Auth::user()->name.' PaymentVendor to '.$request->name;
-				$result2 = $transaction->save();
-			}
-			
-			if($result){
-				return back()->with('success', 'Record added successfully!');
-			}
-			else{
-				return back()->with('error', 'Something went wrong!');
-			}
+		if(!empty($request->file('voucher_img')))
+		{
+			$image = $request->file('voucher_img');
+			$image_name = time().'.'.$image->getClientOriginalExtension();
+			$image->move(public_path('uploads/paymentvendor/'), $image_name);
+		    $expense->voucher_img = $image_name;
 		}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
+
+		$date = $request->date;
+		$formInfo->date = date_format(date_create($date),"Y-m-d");
+		$formInfo->voucher_no = $request->voucher_no;
+		$formInfo->created_for = $request->name;
+		$formInfo->amount = $request->amount;
+		$formInfo->epay_no = $request->epay_no;
+		$formInfo->bank_id = $request->bank;
+		$formInfo->mode = $request->mode;
+		$formInfo->txn_no = $request->txn_no;
+		$formInfo->remark = $request->remarks;
+		$formInfo->user_sys = \Request::ip();
+		$formInfo->updated_by = Auth::id();
+		$formInfo->created_by = Auth::id(); 
+		$result = $formInfo->save();
+
+		$transaction = new Transaction;
+		$transaction->txn_type = 2;  	//1- Expense, 2- Payment
+		$transaction->voucher_no = $formInfo->voucher_no;
+		$transaction->vendor_id = $formInfo->created_for;
+		$transaction->credit = $formInfo->amount;
+		if ($formInfo->mode==4) {
+			$transaction->particulars = 'Discount to Vendor for '.$formInfo->voucher_no;
 		}
-    }
+		else{
+			$transaction->particulars = 'Payment to Vendor for '.$formInfo->voucher_no;
+		}
+		$transaction->user_sys = \Request::ip();
+		$transaction->updated_by = Auth::id();
+		$transaction->created_by = Auth::id();
+		$result2 = $transaction->save();
+
+		$transaction = Transaction::find($transaction->id);
+		$transaction->txn_id = 'PLS_TXN_'.date('ym').sprintf("%04d", $transaction->id);
+		$result = $transaction->save();
+		
+		if($result){
+			return back()->with('success', 'Record added successfully!');
+		}
+		else{
+			return back()->with('error', 'Something went wrong!');
+		}
+	}
 
     public function show($id)
     {
-        try{
-        	$deposit = PaymentVendor::find($id);
-	        $userdetails = PaymentVendor::find($id)->BankDetails;
-	        return view('payment-vendor.show')->with(array('deposit' => $deposit, 'userdetails' => $userdetails));
-    	}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
-		}
-    }
+    	$transaction = Transaction::where('vendor_id',$id)->get(); 
+        $vendor = Vendor::find($id);
+        $balance = 0;
+        return view('payment-vendor.show')->with(array('transaction' => $transaction, 'vendor' => $vendor,'balance' => $balance));
+	}
 
     public function edit($id)
     {
@@ -277,7 +226,7 @@ class PaymentVendorController extends Controller
 			
 			//trans table
 			if(Auth::user()->user_type==4){
-				$transaction = BankTransaction::where('voucher_no', $expense->txn_no)->first();
+				$transaction = BankTransaction::where('voucher_no', $formInfo->txn_no)->first();
 				$transaction->credit = $request->amount;
 				$transaction->user_sys = \Request::ip();
 				$transaction->updated_by = Auth::id();
@@ -298,124 +247,17 @@ class PaymentVendorController extends Controller
 		}
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-    	try{
-    		if(Auth::user()->user_type==4)
-	    	{
-				$deposit = BankPaymentVendor::find($id);
-			}
-			else
-	        $deposit = PaymentVendor::find($id);
-	    
-	        $result = $deposit->delete($id);
-	        if($result){
-				return redirect()->back()->with('success', 'Record deleted successfully!');
-			}
-			else{
-				return redirect()->back()->with('error', 'Something went wrong!');
-			}
+    	$data = Transaction::find($id);
+        $result = $data->delete($id);
+        
+        if($result){
+			return redirect()->back()->with('success', 'Record deleted successfully!');
 		}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
+		else{
+			return redirect()->back()->with('error', 'Something went wrong!');
 		}
     }
-	
-	public function return(Request $request, $id)
-    {
-    	try{
-    		$deposit = BankPaymentVendor::find($id);
-	    	$string = $deposit->to_user;
-			$return_balance = BankReturn::return_bal($string);
-			$return_chk = BankReturn::where('txn_id', $id)->first();
-			
-			if(count($return_chk)>0){
-				return redirect()->back()->with('warning', 'Return already exist! Please deposit more and try to return.');
-			}
-			
-			$return = new BankReturn;
-			$return->txn_id = $deposit->id;
-			$return->by_user = $deposit->to_user;
-			$return->amount = $return_balance;
-			$return->mode = 'return';
-			$return->user_sys = \Request::ip();
-			$return->created_by = Auth::id();
-			$return->updated_by = Auth::id();
-			$result = $return->save();
-
-			$return = BankReturn::find($return->id);
-			$return->voucher_no = 'RTN'.$return->id;
-			$result = $return->save();
-
-			$transaction = new BankTransaction;
-			$transaction->txn_type = 3;
-			$transaction->voucher_no = $return->voucher_no;
-			$transaction->debit = $return_balance;
-			$transaction->balance = 0;
-			$transaction->created_for = $deposit->to_user;
-			$transaction->user_sys = \Request::ip();
-			$transaction->updated_by = Auth::id();
-			$transaction->created_by = Auth::id();
-			$transaction->particulars = $deposit->to_user.' Return to '.Auth::user()->name;
-			$result2 = $transaction->save();
-
-	        if($result){
-				return redirect()->back()->with('success', $return_balance.' returned successfully!');
-			}
-			else{
-				return redirect()->back()->with('error', 'Something went wrong!');
-			}
-		}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
-		}
-    }
-
-    public function payeename(Request $request)
-    {
-    	try{
-    		$str = $request->term;
-	    	$temp = BankPaymentVendor::where('to_user', 'like', '%' . $str . '%')->where('created_by', Auth::id())->pluck('to_user');
-	    	return json_encode($temp);
-    	}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
-		}
-    }
-    
-    public function payeeBalance(Request $request)
-    {
-    	try{
-    		$nameofpayee = $request->created_for;
-	    	$temp = PaymentVendor::payeeBalance($nameofpayee);
-	    	return json_encode($temp);
-    	}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
-		}
-    }
-
-    public function id_ajax(Request $request)
-    {
-		try{
-			$workshop_id = $request->id;
-			$employee = Vendor::where([['location',$workshop_id],['id','!=',Auth::id()]])->get();
-			print_r(json_encode($employee));
-		}
-    	catch(\Exception $e){
-			$error = $e->getMessage();
-		    return back()->with('error', 'Something went wrong! Please contact admin');
-		}
-	}
 
 }

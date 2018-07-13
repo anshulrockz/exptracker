@@ -126,7 +126,7 @@
             <!-- Default Size -->
             <div class="modal fade" id="defaultModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
-                    <form method="post" action="{{route('payment-history.store')}}">
+                    <form method="post" action="{{url('payment-history.store')}}">
                                 {{ csrf_field() }}
                     <div class="modal-content">
                         <div class="modal-header">

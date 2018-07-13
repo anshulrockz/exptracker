@@ -158,7 +158,7 @@
                                 <td>
                                     @if($list->round_off==1) {{round( ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst,0)}} 
                                     @else {{ ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst }} 
-                                    @endif {{ ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst }}
+                                    @endif
                                 </td>
                                 <td>{{ $list->user}} @if(!empty($list->created_for)) ({{$list->created_for}}) @endif </td>
                                 <td>
@@ -238,19 +238,19 @@ $(document).ready(function() {
     var table = $('.datatable').DataTable({
         dom: 'Bfrtip',
         responsive: true,
-        buttons: [
-             {
-                        extend: 'print',
-                        exportOptions: {
-                    columns: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ]
-                }
-                    },
-                    {
-                        extend: 'excel',
-                        exportOptions: {
-                    columns: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ]
-                }
-                    }
+        buttons: [ 'print', 'excel',
+             // {
+             //            extend: 'print',
+             //            exportOptions: {
+             //        columns: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ]
+             //    }
+             //        },
+             //        {
+             //            extend: 'excel',
+             //            exportOptions: {
+             //        columns: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ]
+             //    }
+             //        }
         ],
         "order": [[ 0, "asc" ]],
         // fixedHeader: {

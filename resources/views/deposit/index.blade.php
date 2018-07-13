@@ -45,6 +45,7 @@
                     <table class="table table-bordered table-striped table-hover js-basic-example dataTable">
                         <thead>
                             <tr>
+                                <th>Unique ID</th>
                                 <th>Date</th>
                                 <th>Payment Date</th>
                                 <th>Payment Mode</th>
@@ -66,6 +67,7 @@
                         <tbody>
                         	@foreach( $deposit as $key=>$list)
                             <tr>
+                                <td>{{ $list->txn_id }}</td>
                                 <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
                                 <td>{{date_format(date_create($list->date),"d/m/Y")}}</td>
                                 <td>

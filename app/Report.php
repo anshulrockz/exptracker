@@ -338,7 +338,7 @@ class Report extends Model
 		}
 	}
 	
-	public static function all_transaction()
+	public static function all_received_payment()
 	{
 		$company = Auth::user()->company_id;
 		$workshop = Auth::user()->workshop_id;
@@ -346,44 +346,45 @@ class Report extends Model
 		
 		if(Auth::user()->user_type == 1)
 		{
-			return DB::table('transactions')
-				->select('transactions.*', 'users.name as user')
+			return DB::table('payment_others')
+				->select('payment_others.*', 'users.name as user', 'workshops.name as location')
 				->where([
 				['users.company_id',$company],
-				['transactions.deleted_at',null]
+				['payment_others.deleted_at',null],
+				['payment_others.mode',2]
 				])
-	            ->leftJoin('users', 'users.id', '=', 'transactions.created_by')
-	            //->leftJoin('users', 'users.id', '=', 'transactions.created_by')
+	            ->leftJoin('users', 'users.id', '=', 'payment_others.created_by')
+	            ->leftJoin('workshops', 'workshops.id', '=', 'payment_others.location_id')
 	            ->get();
 		}
 		
 		if(Auth::user()->user_type == 2)
 		{
-			return DB::table('transactions')
-				->select('transactions.*', 'users.name as user')
+			return DB::table('payment_others')
+				->select('payment_others.*', 'users.name as user', 'workshops.name as location')
 				->where([
-				['users.company_id',$company],
 				['users.workshop_id',$workshop],
-				['transactions.deleted_at',null]
+				['payment_others.deleted_at',null],
+				['payment_others.mode',2]
 				])
-	            ->leftJoin('users', 'users.id', '=', 'transactions.created_by')
+	            ->leftJoin('users', 'users.id', '=', 'payment_others.created_by')
+	            ->leftJoin('workshops', 'workshops.id', '=', 'payment_others.location_id')
 	            ->get();
 		}
 		
-		if(Auth::user()->user_type == 3)
+		else
 		{
-			return DB::table('transactions')
-				->select('transactions.*', 'users.name as user')
+			return DB::table('payment_others')
+				->select('payment_others.*', 'users.name as user', 'workshops.name as location')
 				->where([
-				['users.company_id',$company],
-				['users.workshop_id',$workshop],
 				['users.id',$user_id],
-				['transactions.deleted_at',null]
+				['payment_others.deleted_at',null],
+				['payment_others.mode',2]
 				])
-	            ->leftJoin('users', 'users.id', '=', 'transactions.created_by')
+	            ->leftJoin('users', 'users.id', '=', 'payment_others.created_by')
+	            ->leftJoin('workshops', 'workshops.id', '=', 'payment_others.location_id')
 	            ->get();
 		}
 	}
 
-	
 }

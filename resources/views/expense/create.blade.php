@@ -13,6 +13,9 @@
 <!-- AJAX DD Selecter for Category Js -->
 
 <script>
+
+
+
 $(function(){
 $("#expense_category_main").change(function(){
 	var id = $(this).val();
@@ -34,6 +37,7 @@ $("#expense_category_main").change(function(){
 		                selOpts += "<option value='"+id+"'>"+val+"</option>";
 		            }
 		            $('#description_main').append(selOpts);
+		            $('#description_main').selectpicker('refresh');
 				}
 				else{
 					$('#description_main option').remove();
@@ -97,10 +101,6 @@ $(function(){
 		        	var total_cgst = 0; 
 		        	var total_igst = 0; 
 					var total_amount = 0; 
-		        	//var type = $('#supply_type_main option:selected').text();
-		        	//var category = $('#supply_category_main option:selected').text();
-		        	//var description = $('#description_main option:selected').text(); 
-		        	// var code = $('#code_main').val();
 		        	var tax = $('#tax_main').val();
 		        	
 		        	if(cost < 0) cost = 0;
@@ -152,19 +152,12 @@ $(function(){
 						total_amount = parseFloat(total_amount).toFixed(0);
 			        }
 
-			  //   	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-			  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-			  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-			  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-					// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
-
 					$('.amount_before_tax_td').html(parseFloat(total_cost));
 			    	$('.sgst_amount_td').html(parseFloat(total_sgst));
 			    	$('.cgst_amount_td').html(parseFloat(total_cgst));
 			    	$('.igst_amount_td').html(parseFloat(total_igst));
 					$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(5)+'"/>');
-					// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
-
+					
 					$('#radio_1').prop('disabled',true);
 		        	$('#radio_2').prop('disabled',true);
 		        	$('.dataTable').show();
@@ -212,20 +205,12 @@ $(function(){
             //total_amount = $('#total_amount').val();
 			total_amount = parseFloat(total_amount).toFixed(0);
         }
-    	// discount = $('#discount').val();
-    	
-		// $('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-		// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
 
     	$('.amount_before_tax_td').html(parseFloat(total_cost));
     	$('.sgst_amount_td').html(parseFloat(total_sgst));
     	$('.cgst_amount_td').html(parseFloat(total_cgst));
     	$('.igst_amount_td').html(parseFloat(total_igst));
     	$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
-		// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
 	});
 
 	$("#round_off").change(function(){
@@ -242,18 +227,6 @@ $(function(){
 		$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
 	});
 
-	// $('#discount').on('keyup', function(e){
-	// 	e.preventDefault();
-		
-	// 	var discount = 0; 
-	// 	var total_amount = 0;
-
- //    	discount = $('#discount').val();
- //    	total_amount = $('#total_amount').val();
-
-	// 	$('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
-		
-	// }); 
 });    
 
 
@@ -333,7 +306,7 @@ $(document).ready(function() {
 	                </h2>
 	            </div>
             	<div class="body">
-                	 <div class="row clearfix">
+                	<div class="row clearfix">
 	                	<div class="col-sm-3">
 	                		<label for="voucher_no">Voucher No.(auto)</label>
 		                    <div class="form-group form-float">
@@ -366,14 +339,13 @@ $(document).ready(function() {
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-6 ">
+	                    <div class="col-sm-3 ">
 		                    <label for="vendor_id">Vendor Name</label>
 		                    <div class="form-group">
 			                    <div class="form-line">
-			                        <select class="form-control show-tick" id="vendor_id" name="vendor_id" required>
-			                            <option value="" >-- Please select Vendor --</option>
+			                        <select class="form-control show-tick" data-live-search="true" required id="vendor_id" name="vendor_id" >
 			                            @foreach($vendor as $list)
-			                            <option value="{{$list->id}}">{{$list->name}}  ({{$list->gst}})</option>
+			                            <option value="{{$list->id}}"> {{$list->name}}  (GSTIN#{{$list->gst}}#)</option>
 			                            @endforeach
 			                        </select>
 		                    	</div>
@@ -395,7 +367,7 @@ $(document).ready(function() {
 		                        </div>
 		                    </div>
 	                    </div> -->
-	                    <div class="col-sm-3">
+	                    <!-- <div class="col-sm-3">
 		                    <label for="mode">Mode Of Payment</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
@@ -405,7 +377,7 @@ $(document).ready(function() {
 			                        </select>
 		                        </div>
 		                    </div>
-	                    </div>
+	                    </div> -->
 	                    <div class="col-sm-3">
 		                    <label for="location">Location</label>
 		                    <div class="form-group">
@@ -422,7 +394,7 @@ $(document).ready(function() {
 	                    <div class="col-sm-3 ">
 		                    <label for="voucher_img">Upload Document</label>
 		                    <div class="form-group form-float">
-		                        <div class="form-line ">
+		                        <div class="form-line">
 	                                <div class="fallback">
 	                                    <input name="voucher_img" id="voucher_img" class="form-control" type="file" placeholder="img only"  accept="image/x-png,image/gif,image/jpeg" title="image/x-png,image/gif,image/jpeg 5MB" max-size=5120/>
 	                                </div>
@@ -441,8 +413,8 @@ $(document).ready(function() {
 		                </div>
 	                </div>
 	                <div class="row clearfix">
-	                	<div class="col-sm-12" style="overflow:auto">
-			                <table class="table table-bordered table-striped table-hover" >
+	                	<div class="col-sm-12 " >
+			                <table class="table table-bordered table-striped table-hover " >
 		                        <thead>
 		                            <tr>
 		                                <th >Exp Cat.</th>
@@ -482,7 +454,7 @@ $(document).ready(function() {
 		                                <td>
 						                    <div class="form-group">
 							                    <div class="form-line focused">
-							                        <select class="form-control show-tick" id="expense_category_main" required>
+							                        <select class="form-control show-tick" id="expense_category_main" required > 
 							                           <option value="" >select</option>
 							                        	@foreach($expense_category as $list)
 							                            <option value="{{$list->id}}">{{$list->name}}</option>
@@ -667,7 +639,7 @@ $(document).ready(function() {
 						                        <div class="form-line">
 					                                <div class="fallback">
 					                                    <input name="total_discount_amount" id="total_discount_amount" class="form-control " type="hidden" />
-					                                <!-- </div>
+					                                <!- </div>
 							                    </div>
 						                    </div> ->
 					                	</td>
@@ -714,20 +686,22 @@ $('.datepicker').bootstrapMaterialDatePicker({
       maxLength:10
     });
 
-	$("#party_name").change(function(){
-		var party_name = $( "#party_name" ).val();
-		$.ajax({
-				type: "GET",
-				url: "{{url('expenses/partygstin')}}",
-				data:'party_name='+party_name,
-				success: function(data){
-					console.log(data);
-					var data = JSON.parse(data);
-					$( "#party_gstin" ).val(data);
-	                var category = data.supply_category;
-	    }});
+	$("#vendor_id").change(function(){
+		@php $comapny = getAllFromID(Auth::user()->company_id, 'companies') @endphp
+		var company_gstin = "{{$comapny->gst}}"; 
+		var company_gstin_code = parseInt(company_gstin.substring(0,2));
+		var vendor_gstin = $( "#vendor_id option:selected" ).text().split('#');
+		var vendor_gstin_code = parseInt(vendor_gstin[1].substring(0,2));
+		if (company_gstin_code == vendor_gstin_code) {
+			$('#radio_1').attr('checked');
+			$('#tax_type').val(1);
+		}
+		else{
+			$('#radio_2').attr('checked');
+			$('#tax_type').val(2);
+		}
+		
 	});
-
 
     $( "#created_for" ).autocomplete({
       source: '{{url('user-deposit/payeename')}}',
@@ -750,9 +724,14 @@ $('.datepicker').bootstrapMaterialDatePicker({
 	});
 
   });
+
+  	$( document ).ready(function() {
+		$('#expense_category_main').selectpicker('refresh');
+		$('#vendor_id').selectpicker('refresh');
+	});
   </script>
     
-<!-- Select Plugin Js ->
-<script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>-->
+ <!-- Select Plugin Js -->
+<script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>
 
 @endsection

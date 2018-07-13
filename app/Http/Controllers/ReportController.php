@@ -7,6 +7,7 @@ use App\Report;
 use App\AssetNew;
 use App\Expense;
 use App\Deposit;
+use App\PaymentOther;
 use App\Transaction;
 
 class ReportController extends Controller
@@ -26,7 +27,7 @@ class ReportController extends Controller
 	public function expense()
     {
         try{
-        	$expense = Report::all_expenses(); 
+            $expense = Report::all_expenses(); 
             return view('report.expense')->with('report', $expense);
         }
         catch(\Exception $e){
@@ -34,18 +35,18 @@ class ReportController extends Controller
             return back()->with('error', 'Something went wrong! Please contact admin');
         }
     }
+    
+    public function cheque()
+    {
+    	$cheque = Report::all_cheques(); 
+        return view('report.cheque')->with('report', $cheque);
+    }
 
 	public function asset()
     {
-        try{
-            $asset = Report::all_assets();
-            $assetnew = Report::all_asset_news();
-            return view('report.asset')->with(array('report' => $asset, 'reportNew' => $assetnew ));
-        }
-        catch(\Exception $e){
-            $error = $e->getMessage();
-            return back()->with('error', 'Something went wrong! Please contact admin');
-        }
+        $asset = Report::all_assets();
+        $assetnew = Report::all_asset_news();
+        return view('report.asset')->with(array('report' => $asset, 'reportNew' => $assetnew ));
     }
     
     public function expiry()
@@ -61,16 +62,10 @@ class ReportController extends Controller
         }
     }
     
-	public function ledger()
+	public function received_payment()
     {
-        try{
-            $transaction = Report::all_transaction();
-            return view('report.ledger')->with('report', $transaction);
-        }
-        catch(\Exception $e){
-            $error = $e->getMessage();
-            return back()->with('error', 'Something went wrong! Please contact admin');
-        }
+        $transaction = Report::all_received_payment();
+        return view('report.received-payment')->with('report', $transaction);
     }
 
 	public function overall()

@@ -31,15 +31,13 @@ class PaymentOther extends Model
 		
 		if($user_type == 1  || $user_type == 5){
 			return DB::table('payment_others')
-			->select('payment_others.*', 'users.name as user')
+			->select('payment_others.*', 'users.name as user') //, DB::raw('COUNT(job_details.id) as job_details_id'))
 			->where([
-			['payment_others.deleted_at',null],
-					    //['users.workshop_id', $workshop],
-					    //['payment_others.created_by', $id],
-					    //['users.id', $id]
-						])
-	            ->leftJoin('users', 'users.id', '=', 'payment_others.created_by')
-				->get();
+					['payment_others.deleted_at',null],
+					])
+            ->leftJoin('users', 'users.id', '=', 'payment_others.created_by')
+            // ->leftJoin('job_details', 'job_details.parent_id', '=', 'payment_others.id')
+			->get();
 		}
 
        	if($user_type == 3){
@@ -56,11 +54,12 @@ class PaymentOther extends Model
 
 		else{
 			return DB::table('payment_others')
-				->select('payment_others.*')
+				->select('payment_others.*', 'users.name as user')
 				->where([
 						['payment_others.deleted_at',null],
 						['payment_others.created_by', $id],
 						])
+	            ->leftJoin('users', 'users.id', '=', 'payment_others.created_by')
 	            ->get();
 		}
 	}

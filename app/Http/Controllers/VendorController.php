@@ -30,7 +30,7 @@ class VendorController extends Controller
     	if(empty($voucher_no)) $voucher_no == 0;
     	else $voucher_no = $voucher_no->id;
     	$voucher_no = $voucher_no + 1;
-    	$voucher_no = 'VEN_'.date('y').sprintf("%03d", $voucher_no);
+    	$voucher_no = 'PLS_VEN_'.date('ym').sprintf("%03d", $voucher_no);
 
         return view('vendor.create')->with(array('state' => $state, 'location' => $location, 'voucher_no' => $voucher_no, ));
     }
@@ -40,6 +40,7 @@ class VendorController extends Controller
         $this->validate($request,[
 			'name'=>'required|max:255',
 			'email'=>'required|max:255',
+			// 'uid'=>'required|max:255',
 			'gstin'=>'required',
 			'acc_no'=>'numeric'
 		]);
@@ -57,7 +58,7 @@ class VendorController extends Controller
 		    $vendor->doc_img = $image_name;
 		}
 
-		$vendor->uid = $request->uid;
+		// $vendor->uid = $request->uid;
 		$vendor->name = $request->name;
 		$vendor->gst = $request->gstin;
 		$vendor->contact_person = $request->contact_person;
@@ -77,6 +78,10 @@ class VendorController extends Controller
 		$vendor->created_by = Auth::id();
 		
 		$result = $vendor->save();
+
+		$vendor = Vendor::find($vendor->id);
+		$vendor->uid = 'PLS_VEN_'.date('ym').sprintf("%03d", $vendor->id);
+		$result = $vendor->save();
 		
 		if($result){
 			return back()->with('success', 'Record added successfully!');
@@ -94,8 +99,10 @@ class VendorController extends Controller
 
     public function edit($id)
     {
+    	$state = State::orderBy('name')->get();
+    	$location = Workshop::orderBy('name')->get();
         $vendor = Vendor::find($id);
-        return view('vendor.edit')->with('vendor', $vendor);
+        return view('vendor.edit')->with(array('vendor' => $vendor, 'state' => $state, 'location' => $location, ));
     }
 
     public function update(Request $request, $id)
@@ -103,7 +110,9 @@ class VendorController extends Controller
         $this->validate($request,[
 			'name'=>'required|max:255',
 			'email'=>'required|max:255',
-			'acc_no'=>'numerics'
+			// 'uid'=>'required|max:255',
+			'gstin'=>'required',
+			'acc_no'=>'numeric'
 		]);
 
 		$vendor = Vendor::find($id); 

@@ -86,7 +86,7 @@
                                     <select class="form-control show-tick" id="state_code" name="state_code" >
                                         <option >select</option>
                                         @foreach($state as $list)
-                                        <option value="{{$list->id}}">{{$list->name}} ({{$list->id}})</option>
+                                        <option value="{{$list->id}}">{{$list->name}} ({{sprintf("%02d",$list->id)}})</option>
                                         @endforeach
                                     </select>
                                 </div>

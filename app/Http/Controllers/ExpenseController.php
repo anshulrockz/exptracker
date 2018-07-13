@@ -33,7 +33,6 @@ class ExpenseController extends Controller
 			return view('expense.index')->with('expense',$expense);
 		}
     	
-    	
     	if(Auth::user()->user_type == 3)
     	{
 			$expense = $this->expense->workshop_all();
@@ -76,7 +75,7 @@ class ExpenseController extends Controller
 	    	if(empty($voucher_no)) $voucher_no == 0;
 	    	else $voucher_no = $voucher_no->id;
 	    	$voucher_no = $voucher_no + 1;
-	    	$voucher_no = 'PLS_ET_'.date('ym').sprintf("%03d", $voucher_no);
+	    	$voucher_no = 'PLS_ET_'.sprintf("%04d", $voucher_no);
 
 	        return view('expense.create')->with(array( 'expense_category' => $expense_category, 'description' => $description, 'tax' => $tax, 'balance' => $balance, 'voucher_no' => $voucher_no, 'workshop' => $workshop, 'vendor' => $vendor));
     }
@@ -99,8 +98,8 @@ class ExpenseController extends Controller
         }
 
 		$expense = new Expense;
-		$expense->mode = $request->mode;
-		$expense->paid_in  = $request->mode;
+		$expense->mode = 2; //$request->mode; // 1-cash, 2-Credit
+		$expense->paid_in  = 2; //$request->mode;
 
 		if($balance < $request->total_amount){
 			$expense->mode = 2;
@@ -171,29 +170,51 @@ class ExpenseController extends Controller
 		}
 		
 		$expense = Expense::find($expense->id);
-		$expense->voucher_no = 'PLS_ET_'.date('ym').sprintf("%04d", $expense->id);
+		$expense->voucher_no = 'PLS_ET_'.sprintf("%04d", $expense->id);
 		$expense->amount = $amount;
 		$result = $expense->save();
 
 		$transaction = new Transaction;
-		$transaction->txn_type = 1;  	//1- Expense, 2- Payment
 		$transaction->voucher_no = $expense->voucher_no;
 		$transaction->invoice_no = $expense->invoice_no;
 		$transaction->invoice_date = $expense->invoice_date;
 		$transaction->vendor_id = $expense->vendor_id;
-		if($expense->mode = 1)
 		$transaction->debit = $amount;
-		if($expense->mode = 2)
-		$transaction->credit = $amount;
+		// $transaction->credit = null;
+		$transaction->txn_type = 10;  	//11-Expense-cash, 1-Expense, 2-Payment
 		$transaction->particulars = 'Spent for expense '.$expense->voucher_no;
 		$transaction->user_sys = \Request::ip();
 		$transaction->updated_by = Auth::id();
 		$transaction->created_by = Auth::id();
-		$result2 = $transaction->save();
+		$transaction->save();
 
 		$transaction = Transaction::find($transaction->id);
-		$transaction->voucher_no = 'PLS_TXN_'.date('ym').sprintf("%04d", $transaction->id);
-		$result = $transaction->save();
+		$transaction->txn_id = 'PLS_TXN_'.date('ym').sprintf("%04d", $transaction->id);
+		$transaction->save();
+
+		// if($expense->mode = 1){
+		// 	// $transaction->debit = null;
+		// 	// $transaction->credit = $amount;
+		// 	// $transaction->particulars = 'Paid for expense '.$expense->voucher_no;
+		// 	// $transaction->txn_type = 11;  	//11-Expense-cash, 1-Expense, 2-Payment
+		// 	$transaction2 = new Transaction;
+		// 	$transaction2->voucher_no = $expense->voucher_no;
+		// 	$transaction2->invoice_no = $expense->invoice_no;
+		// 	$transaction2->invoice_date = $expense->invoice_date;
+		// 	$transaction2->vendor_id = $expense->vendor_id;
+		// 	$transaction2->debit = null;
+		// 	$transaction2->credit = $amount;
+		// 	$transaction2->txn_type = 11;  	//11-Expense-cash, 1-Expense, 2-Payment
+		// 	$transaction2->particulars = 'Paid for expense '.$expense->voucher_no;
+		// 	$transaction2->user_sys = \Request::ip();
+		// 	$transaction2->updated_by = Auth::id();
+		// 	$transaction2->created_by = Auth::id();
+		// 	$transaction2->save();
+
+		// 	$transaction2 = Transaction::find($transaction2->id);
+		// 	$transaction2->txn_id = 'PLS_TXN_'.date('ym').sprintf("%04d", $transaction2->id);
+		// 	$transaction2->save();
+		// }
 
 		//trans table
 		if($request->created_for && Auth::user()->user_type==4){
@@ -237,12 +258,15 @@ class ExpenseController extends Controller
 	    	$description = Description::all();
 	    	$tax = Tax::all();
 	    	$expense_category = ExpenseCategory::orderBy('name', 'ASC')->get();
-	    	$purchase_category = PurchaseCategory::all();
 	        $expense = Expense::find($id);
 	    	$workshop = Workshop::all();
+	    	if(Auth::user()->user_type == 1 || Auth::user()->user_type == 5)
+	    	$vendor = Vendor::all();
+	    	else
+	    	$vendor = Vendor::where('location', Auth::user()->workshop_id)->get();
 	        $expense_details = Expense::find($id)->ExpenseDetails; 
 	    	$balance = $this->expense->balance($expense->created_by); //dd($balance );
-	        return view('expense.edit')->with(array('expense' => $expense, 'expense_category' => $expense_category, 'purchase_category' => $purchase_category, 'balance' => $balance, 'expense_details' => $expense_details, 'description' => $description, 'tax' => $tax, 'workshop' => $workshop) );
+	        return view('expense.edit')->with(array('expense' => $expense, 'expense_category' => $expense_category, 'balance' => $balance, 'expense_details' => $expense_details, 'description' => $description, 'tax' => $tax, 'workshop' => $workshop, 'vendor' => $vendor) );
 	    }
     	catch(\Exception $e){
 			$error = $e->getMessage();
@@ -253,7 +277,7 @@ class ExpenseController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request,[
-			'party_name'=>'required|max:255',
+			// 'party_name'=>'required|max:255',
 			'total_amount'=>'required|min:1',
 		]);
 
@@ -267,13 +291,18 @@ class ExpenseController extends Controller
 	    	}
         }
 
+        $vendor = Vendor::find($request->vendor_id);
+
 		$expense = Expense::find($id);
 		$date = $request->invoice_date;
 		$expense->invoice_date = date_format(date_create($date),"Y-m-d");
 		$expense->invoice_no = $request->invoice_no;
-		$expense->party_name = $request->party_name;
-		$expense->party_gstin = $request->party_gstin;
-		$expense->paid_in = $request->mode;
+		$expense->vendor_id = $request->vendor_id;
+		$expense->party_name = $vendor->name;
+		$expense->party_gstin = $vendor->gst;
+		// $expense->party_name = $request->party_name;
+		// $expense->party_gstin = $request->party_gstin;
+		$expense->paid_in = 2;
 		$expense->amount = $request->total_amount;
 		$expense->round_off = $request->round_off;
 		
@@ -359,7 +388,15 @@ class ExpenseController extends Controller
 			$transaction->particulars = Auth::user()->name.' spent '.$expense->amount.' to purchase '.$expense->subject;
 			$result2 = $transaction->save();
 		}
-		
+
+		$transaction = Transaction::where('voucher_no',$expense->voucher_no)->first();
+        if (!empty($transaction)){
+			
+			$transaction->debit = $amount;
+			$transaction->updated_by = Auth::id();
+			$transaction->save();
+		}
+
 		if($result){
 			return redirect()->back()->with('success', 'Record updated successfully!');
 		}
@@ -373,6 +410,11 @@ class ExpenseController extends Controller
     	try{
 	        $expense = Expense::find($id);
 	        $result = $expense->delete($id);
+
+	        $voucher_no = 'PLS_ET_'.sprintf("%04d", $id);
+	        $transaction = Transaction::where('voucher_no',$voucher_no)->first();
+	        if (!empty($transaction))
+	        $result = $transaction->delete($voucher_no);
 	        
 	        if($result){
 				return redirect()->back()->with('success', 'Record deleted successfully!');
@@ -393,9 +435,14 @@ class ExpenseController extends Controller
 	        $expense = Expense::find($id);
 	        $expense->status = 2;
 	        $result = $expense->save();
+
+	        $voucher_no = 'PLS_ET_'.sprintf("%04d", $id);
+	        $transaction = Transaction::where('voucher_no',$voucher_no)->first();
+	        if (!empty($transaction))
+	        $result = $transaction->delete($voucher_no);
 	        
 	        if($result){
-				return redirect()->back()->with('success', 'Record deleted successfully!');
+				return redirect()->back()->with('success', 'Record canceled!');
 			}
 			else{
 				return redirect()->back()->with('error', 'Something went wrong!');

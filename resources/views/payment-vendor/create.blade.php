@@ -46,7 +46,7 @@ $(function(){
 			$('#name option').remove();
 			$.ajax({
 				type: "GET",
-				url: "{{url('/payment/vendors/ajax')}}",
+				url: "{{url('/payment-vendors/ajax')}}",
 				data:'id='+id,
 				success: function(data){
 					var data = JSON.parse(data);
@@ -71,29 +71,46 @@ $(function(){
 });
 
 $(document).ready(function() {
+	$('.bank').hide();
+	$('.epay_no').hide();
 	$('.acc_no').hide();
 	$('.ifsc').hide();
 	$('.txn_no').hide();
 });
 function paymentMode(mode){
 	if(mode == '3'){
-		$('.acc_no').show();
-		$('.ifsc').show();
-		$('.txn_no').show();
+		$('.bank').show();
+		$('.epay_no').show();
+		$('.acc_no').hide();
+		$('.ifsc').hide();
+		$('.txn_no').hide();
 	}
 	else if(mode == '2'){
-		$('.txn_no').show();
+		$('.bank').show();
+		$('.epay_no').hide();
 		$('.acc_no').hide();
 		$('.ifsc').hide();
+		$('.txn_no').show();
+	}
+	else if(mode == '4'){
+		$('.bank').hide();
+		$('.epay_no').hide();
+		$('.acc_no').hide();
+		$('.ifsc').hide();
+		$('.txn_no').hide();
 	}
 	else if(mode == '1'){
-		$('.txn_no').hide();
+		$('.bank').hide();
+		$('.epay_no').hide();
 		$('.acc_no').hide();
 		$('.ifsc').hide();
+		$('.txn_no').hide();
 	}
 	else{
+		$('.bank').hide();
+		$('.epay_no').hide();
 		$('.acc_no').hide();
-		$('.ifsc').hide();;
+		$('.ifsc').hide();
 		$('.txn_no').hide();
 	}
 }
@@ -110,7 +127,7 @@ function paymentMode(mode){
             <div class="body">
                 <ol class="breadcrumb breadcrumb-bg-pink">
                     <li><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li><a href="{{ url('/payment/vendors') }}">Deposit</a></li>
+                    <li><a href="{{ url('/payment-vendors') }}">Payments</a></li>
                     <li class="active">Pay</li>
                 </ol>
             </div>
@@ -141,54 +158,32 @@ function paymentMode(mode){
                 <form method="post" action="{{route('payment-vendors.store')}}">
                 	{{ csrf_field() }}
                 	 <div class="row clearfix">
-                	 	@if(Auth::user()->user_type==1 || Auth::user()->user_type==5)
-	                    <div class="col-sm-6">
-		                    <label for="company">Company</label>
-		                    <div class="form-group">
-			                    <div class="form-line">
-			                        <select class="form-control show-tick" id="company" name="company" required>
-			                            <option value="">-- Please select company --</option>
-			                            @foreach($companies as $list)
-			                            <option value="{{$list->id}}">{{$list->name}}</option>
-			                            @endforeach
-			                        </select>
-		                    	</div>
-	                    	</div>
+                	 	<div class="col-sm-3">
+	                		<label for="voucher_no">Sr. No.(auto)</label>
+		                    <div class="form-group form-float">
+		                        <div class="form-line ">
+		                            <input type="text" id="voucher_no" name="voucher_no" class="form-control" placeholder="Enter voucher number" value="{{ $voucher_no }}" readonly>
+		                        </div>
+		                    </div>
 	                    </div>
-	                    @endif
-	                    @if(Auth::user()->user_type==1 || Auth::user()->user_type==5)
-	                    <div class="col-sm-6">
-		                    <label for="workshop">Location</label>
-		                    <div class="form-group">
-			                    <div class="form-line">
-			                        <select class="form-control show-tick" id="workshop" name="workshop">
-			                            <option value="">-- Please select location --</option>
-			                            @if(Auth::user()->user_type==2)
-				                            @foreach($workshops as $list)
-				                            <option value="{{$list->id}}">{{$list->name}}</option>
-				                            @endforeach
-			                            @endif
-			                        </select>
-		                    	</div>
-	                    	</div>
+	                    <div class="col-sm-3">
+		                    <label for="voucher_date">Date</label>
+		                    <div class="form-group form-float">
+		                        <div class="form-line ">
+		                            <input type="text" id="voucher_date" name="voucher_date" class="form-control" placeholder="Enter Date Of voucher" value="{{  date('d F Y') }}" readonly>
+		                        </div>
+		                    </div>
 	                    </div>
-	                    @endif
 	                	<div class="col-sm-6">
-		                    <label for="name">Payee</label>
+		                    <label for="name">Vendor Name</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                        	@if(Auth::user()->user_type==4)
-			                            <input type="text" id="name" name="name" class="form-control " placeholder="Enter employee name">
-		                            @else
 		                            <select class="form-control show-tick" id="name" name="name" required>
-			                            <option value="">-- Please select employee name --</option>
-			                            @if(Auth::user()->user_type==3)
-				                            @foreach($users as $list)
-				                            <option value="{{$list->id}}">{{$list->name}}</option>
+			                            <option value="">-- Please select vendor name --</option>
+				                            @foreach($vendor as $list)
+				                            <option value="{{$list->id}}">{{$list->name}}(GSTIN-{{$list->gst}})</option>
 				                            @endforeach
-			                            @endif
 			                        </select>
-			                        @endif
 		                        </div>
 		                    </div>
 	                    </div>
@@ -217,9 +212,31 @@ function paymentMode(mode){
 			                            <option value="1">Cash</option>
 			                            <option value="2">Cheque</option>
 			                            <option value="3">Direct Transfer</option>
+			                            <option value="4">Credit Note/Discount</option>
 			                        </select>
 		                        </div>
 		                    </div>
+	                    </div>
+	                    <div class="col-sm-6 epay_no">
+		                    <label for="epay_no">Epay No.</label>
+		                    <div class="form-group">
+		                        <div class="form-line">
+		                            <input type="text" id="epay_no" name="epay_no" class="form-control" placeholder="  Enter epay_no" value="{{ old('epay_no') }}">
+		                        </div>
+		                    </div>
+	                    </div>
+	                    <div class="col-sm-6 bank">
+	                    	<label for="bank">Bank</label>
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <select class="form-control show-tick" id="bank" name="bank">
+                                        <option value="" >-- Please select category --</option>
+                                        @foreach($bank as $list)
+                                        <option value="{{$list->id}}">{{$list->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 	                    </div>
 	                    <div class="col-sm-6 acc_no">
 		                    <label for="acc_no">Account No</label>
@@ -238,14 +255,24 @@ function paymentMode(mode){
 		                    </div>
 	                    </div>
 	                    <div class="col-sm-6 txn_no">
-		                    <label for="txn_no">Cheque/Transaction No.</label>
+		                    <label for="txn_no">Cheque No.</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
 		                            <input type="text" id="txn_no" name="txn_no" class="form-control" placeholder="Enter Payment ID" value="{{ old('txn_no') }}">
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-12">
+	                    <div class="col-sm-6 ">
+		                    <label for="voucher_img">Upload Document</label>
+		                    <div class="form-group">
+		                        <div class="form-line">
+	                                <div class="fallback">
+	                                    <input name="voucher_img" id="voucher_img" class="form-control" type="file" placeholder="img only" accept="image/x-png,image/gif,image/jpeg" />
+	                                </div>
+			                    </div>
+		                    </div>
+	                    </div>
+	                    <div class="col-sm-6">
 		                    <label for="remarks">Remarks</label>
 		                    <div class="form-group">
 		                        <div class="form-line">

@@ -46,7 +46,7 @@
 
 <body class="theme-cyan">
     <!-- Page Loader -->
-    <div class="page-loader-wrapper">
+    <!-- <div class="page-loader-wrapper">
         <div class="loader">
             <div class="preloader">
                 <div class="spinner-layer pl-red">
@@ -60,7 +60,7 @@
             </div>
             <p>Please wait...</p>
         </div>
-    </div>
+    </div> -->
     <!-- #END# Page Loader -->
     <!-- Overlay For Sidebars -->
     <div class="overlay"></div>
@@ -438,46 +438,28 @@
                         </a>
                     </li>
                     @endif
-                    <!-- <li class="{{ Request::is('cashs*') ? 'active' : '' }}" >
-                        <a href="{{ url('/cashs') }}" >
-                            <i class="material-icons">account_balance_wallet</i>
-                            <span>Deposit Cash</span>
-                        </a>
-                    </li>
-                    <li class="{{ Request::is('cheques*') ? 'active' : '' }}" >
-                        <a href="{{ url('/cheques') }}" >
-                            <i class="material-icons">account_balance_wallet</i>
-                            <span>Deposit Cheque</span>
-                        </a>
-                    </li> -->
                     <li class="{{ Request::is('expenses*') ? 'active' : '' }}" >
                         <a href="{{ url('/expenses') }}" >
                             <i class="material-icons">account_balance_wallet</i>
                             <span>Expense</span>
                         </a>
                     </li>
-                    <li class="{{ Request::is('payment*') ? 'active' : '' }}">
-                        <a href="javascript:void(0); " class="menu-toggle">
+                    <li class="{{ Request::is('received-payments*') ? 'active' : '' }}">
+                        <a href="{{ url('/received-payments') }}" >
                             <i class="material-icons">business_center</i>
-                            <span>Payments</span>
+                            <span>Received Payments</span>
                         </a>
-                        <ul class="ml-menu">
-                            <li class="{{ Request::is('payment/others*') ? 'active' : '' }} ">
-                                <a href="{{ url('/payment/others') }}" >
-                                    <span>Cash/Cheque/Other</span>
-                                </a>
-                            </li>
-                            <li class="{{ Request::is('payment/neft*') ? 'active' : '' }} ">
-                                <a href="{{ url('/payment/nefts') }}" >
-                                    <span>NEFT</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
-                    <li class="{{ Request::is('payment/history*') ? 'active' : '' }}" >
+                    <!-- <li class="{{ Request::is('payment/history*') ? 'active' : '' }}" >
                         <a href="{{ url('/payment/history') }}" >
                             <i class="material-icons">receipt</i>
                             <span>Payment History</span>
+                        </a>
+                    </li> -->
+                    <li class="{{ Request::is('payment-vendors*') ? 'active' : '' }}" >
+                        <a href="{{ url('/payment-vendors') }}" >
+                            <i class="material-icons">receipt</i>
+                            <span>Vendor Acc Statement</span>
                         </a>
                     </li>
                     @if(auth::user()->user_type == 1 || auth::user()->user_type == 3 || auth::user()->user_type == 5)
@@ -511,10 +493,9 @@
                                     <span>Expense</span>
                                 </a>
                             </li>
-                    @if(auth::user()->user_type == 1 || auth::user()->user_type == 3 || auth::user()->user_type == 5)
-                            <li class="{{ Request::is('report/assets') ? 'active' : '' }}" >
-                                <a href="{{ url('/report/assets') }}">
-                                    <span>Asset</span>
+                            <li class="{{ Request::is('report/received-payments*') ? 'active' : '' }}" >
+                                <a href="{{ url('/report/received-payments') }}">
+                                    <span>Cheque</span>
                                 </a>
                             </li>
                             <li class="{{ Request::is('report/deposits*') ? 'active' : '' }}" >
@@ -522,7 +503,13 @@
                                     <span>Deposit</span>
                                 </a>
                             </li>
-                    @endif
+                            @if(auth::user()->user_type == 1 || auth::user()->user_type == 3 || auth::user()->user_type == 5)
+                            <li class="{{ Request::is('report/assets') ? 'active' : '' }}" >
+                                <a href="{{ url('/report/assets') }}">
+                                    <span>Asset</span>
+                                </a>
+                            </li>
+                            @endif
                             <!-- <li class="{{ Request::is('report/assets/expiry*') ? 'active' : '' }}" >
                                 <a href="{{ url('/report/assets/expiry') }}">
                                     <span>Asset Expiry</span>

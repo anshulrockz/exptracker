@@ -94,48 +94,46 @@ $(function(){
 	});
 });
 $(document).ready(function() {
-	
-	var mode = $("#mode option:selected").val();
-	if(mode == '3'){
-		$('.acc_no').show();
-		$('.ifsc').show();
-		$('.txn_no').show();
-	}
-	else if(mode == '2'){
-		$('.txn_no').show();
-		$('.acc_no').hide();
-		$('.ifsc').hide();
-	}
-	else if(mode == '1'){
-		$('.txn_no').hide();
-		$('.acc_no').hide();
-		$('.ifsc').hide();
-	}
-	else{
-		$('.acc_no').hide();
-		$('.ifsc').hide();;
-		$('.txn_no').hide();
-	}
+	$('.bank').hide();
+	$('.epay_no').hide();
+	$('.acc_no').hide();
+	$('.ifsc').hide();
+	$('.txn_no').hide();
 });
 function paymentMode(mode){
 	if(mode == '3'){
-		$('.acc_no').show();
-		$('.ifsc').show();
-		$('.txn_no').show();
+		$('.bank').show();
+		$('.epay_no').show();
+		$('.acc_no').hide();
+		$('.ifsc').hide();
+		$('.txn_no').hide();
 	}
 	else if(mode == '2'){
-		$('.txn_no').show();
+		$('.bank').show();
+		$('.epay_no').hide();
 		$('.acc_no').hide();
 		$('.ifsc').hide();
+		$('.txn_no').show();
+	}
+	else if(mode == '4'){
+		$('.bank').hide();
+		$('.epay_no').hide();
+		$('.acc_no').hide();
+		$('.ifsc').hide();
+		$('.txn_no').hide();
 	}
 	else if(mode == '1'){
-		$('.txn_no').hide();
+		$('.bank').hide();
+		$('.epay_no').hide();
 		$('.acc_no').hide();
 		$('.ifsc').hide();
+		$('.txn_no').hide();
 	}
 	else{
+		$('.bank').hide();
+		$('.epay_no').hide();
 		$('.acc_no').hide();
-		$('.ifsc').hide();;
+		$('.ifsc').hide();
 		$('.txn_no').hide();
 	}
 }

@@ -180,6 +180,22 @@ function paymentMode(mode){
 	                {{ method_field('PUT') }}
 	                
 	                <div class="row clearfix">
+	                	<div class="col-sm-3">
+	                		<label for="voucher_no">Voucher No.(auto)</label>
+		                    <div class="form-group form-float">
+		                        <div class="form-line ">
+		                            <input type="text" id="voucher_no" name="voucher_no" class="form-control" placeholder="Enter voucher number" readonly value="{{ $deposit->txn_id}}">
+		                        </div>
+		                    </div>
+	                    </div>
+                	 	<div class="col-sm-3">
+		                    <label for="voucher_date">Voucher Date</label>
+		                    <div class="form-group form-float">
+		                        <div class="form-line ">
+		                            <input type="text" id="voucher_date" name="voucher_date" class="form-control datepicker" placeholder="Enter Date Of voucher" readonly value="{{ date_format(date_create($deposit->created_at),'d F y') }}">
+		                        </div>
+		                    </div>
+	                    </div>
 	                	@if(Auth::user()->user_type==1 || Auth::user()->user_type==5)
 	                    <div class="col-sm-6">
 		                    <label for="company">Company</label>

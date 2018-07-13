@@ -31,14 +31,6 @@ class DepositController extends Controller
     	try{
 	    	$deposit = Deposit::all_deposits(); //->where('created_by',Auth::id());
     	
-        
-        
-	        /*if(Auth::user()->user_type==2)
-	    	{
-		    	$deposit = Deposit::workshop_deposits();
-		        return view('deposit.index')->with('deposit',$deposit);
-	        }*/
-	        
 	        if(Auth::user()->user_type==3)
 	    	{
 		    	$deposit = Deposit::workshop_deposits();
@@ -59,24 +51,40 @@ class DepositController extends Controller
 
     public function create()
     {
+    	if(Auth::user()->user_type==4){
+			$voucher_no = UserDeposit::lastid();
+			if(empty($voucher_no)) $voucher_no == 0;
+	    	else $voucher_no = $voucher_no->id;
+	    	$voucher_no = $voucher_no + 1;
+	    	$voucher_no = 'SDEP_'.sprintf("%04d", $voucher_no);
+		}
+		else{
+			$voucher_no = Deposit::lastid();
+			if(empty($voucher_no)) $voucher_no == 0;
+	    	else $voucher_no = $voucher_no->id;
+	    	$voucher_no = $voucher_no + 1;
+	    	$voucher_no = 'DEP_'.sprintf("%04d", $voucher_no);
+	    }
+    	
+    	
     	try{
     		if(Auth::user()->user_type==1 || Auth::user()->user_type==5)
 	    	{
 	    		$companies = Company::all();
-	        	return view('deposit.create')->with('companies',$companies);
+	        	return view('deposit.create')->with(array('companies' => $companies, 'voucher_no'=> $voucher_no));
 			}
 			
 	    	if(Auth::user()->user_type==3)
 	    	{
 	    		$users = User::all()->where('workshop_id',Auth::user()->workshop_id)->where('user_type','!=',1)->where('id','!=',Auth::id());
-	    		return view('deposit.create')->with('users',$users);
+	    		return view('deposit.create')->with(array('users' => $users, 'voucher_no'=> $voucher_no));
 			}
 
 			if(Auth::user()->user_type==4)
 	    	{
 	    		$balance = Expense::balance(Auth::id());
 				$users = User::all()->where('workshop_id',Auth::user()->workshop_id)->where('user_type',4)->where('id','!=',Auth::id());
-	    		return view('deposit.create')->with(array('users' => $users, 'balance' => $balance ));
+	    		return view('deposit.create')->with(array('users' => $users, 'balance' => $balance, 'voucher_no'=> $voucher_no ));
 			}
 		}
     	catch(\Exception $e){
@@ -151,7 +159,7 @@ class DepositController extends Controller
 			else
 				$deposit = Deposit::find($id);
 
-			$deposit->txn_id = 'DPO'.$id;
+			$deposit->txn_id = 'DEP_'.$id;
 			$result = $deposit->save();
 			
 			//trans table

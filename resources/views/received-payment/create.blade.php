@@ -15,30 +15,56 @@
 
 <script>
 $(document).ready(function() {
-	$('.acc_no').hide();
+	$('.dod').hide();
+	$('.party_name').hide();
+	$('.card_no').hide();
+	$('.actual_amt').hide();
 	$('.ifsc').hide();
-	$('.txn_no').hide();
+	$('.ref_no').hide();
+	$('.cheque_bank').hide();
+	$('.actual_amt').hide();
+	$('.batch_no').hide();		
 });
 function paymentMode(mode){
 	if(mode == '3'){
-		$('.acc_no').show();
-		$('.ifsc').show();
-		$('.txn_no').show();
+		$('.card_no').show();
+		$('.batch_no').show();
+		$('.actual_amt').show();
+		$('.ifsc').show();	
+		$('.dod').show();
+		$('.ref_no').hide();	
+		$('.cheque_bank').hide();
+		$('.party_name').hide();
 	}
 	else if(mode == '2'){
-		$('.txn_no').show();
-		$('.acc_no').hide();
+		$('.ref_no').show();
+		$('.batch_no').hide();		
+		$('.actual_amt').hide();		
+		$('.dod').show();
+		$('.party_name').show();
+		$('.cheque_bank').show();
+		$('.card_no').hide();
 		$('.ifsc').hide();
 	}
-	else if(mode == '1'){
-		$('.txn_no').hide();
-		$('.acc_no').hide();
+	else if(mode == '1' || mode == '4'){
+		$('.dod').show();
+		$('.batch_no').hide();		
+		$('.ref_no').show();
+		$('.card_no').hide();
+		$('.actual_amt').hide();
 		$('.ifsc').hide();
+		$('.cheque_bank').hide();
+		$('.party_name').show();
 	}
 	else{
-		$('.acc_no').hide();
-		$('.ifsc').hide();;
-		$('.txn_no').hide();
+		$('.dod').hide();
+		$('.batch_no').hide();		
+		$('.actual_amt').hide();		
+		$('.party_name').hide();
+		$('.card_no').hide();
+		$('.ifsc').hide();
+		$('.ref_no').hide();
+		$('.cheque_bank').hide();
 	}
 }
 </script>
@@ -53,7 +79,7 @@ function paymentMode(mode){
             <div class="body">
                 <ol class="breadcrumb breadcrumb-bg-pink">
                     <li><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li><a href="{{ url('/payment/nefts') }}">Payment</a></li>
+                    <li><a href="{{ url('/received-payments') }}">Payment</a></li>
                     <li class="active">Create</li>
                 </ol>
             </div>
@@ -77,14 +103,14 @@ function paymentMode(mode){
                 
             </div>
             <div class="body">
-                <form method="post" action="{{route('others.store')}}" enctype="multipart/form-data">
+                <form method="post" action="{{route('received-payments.store')}}" enctype="multipart/form-data">
                 	{{ csrf_field() }}
                 	<div class="row clearfix pannel-hide">
 	                	<div class="col-sm-3">
-		                    <label for="voucher_no">Sr No.(auto)</label>
+		                    <label for="uid">Sr No.(auto)</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                            <input type="text" id="voucher_no" name="voucher_no" class="form-control" placeholder="Enter number" value="{{ $voucher_no }}" disabled="">
+		                            <input type="text" id="uid" name="uid" class="form-control" placeholder="Enter number" value="{{ $uid }}" disabled="">
 		                        </div>
 		                    </div>
 	                    </div>
@@ -96,28 +122,17 @@ function paymentMode(mode){
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-3">
-		                    <label for="ref_no">Ref. No.</label>
-		                    <div class="form-group">
-		                        <div class="form-line focused">
-		                            <input type="text" id="ref_no" name="ref_no" class="form-control" placeholder="Enter ref. No" value="{{ old('ref_no') }}" >
-		                        </div>
-		                    </div>
-	                    </div>
-	                    <div class="col-sm-3">
-		                    <label for="cheque_date">Deposit Date</label>
+	                    <div class="col-sm-6 ">
+		                    <label for="company_bank">Company Bank</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                            <input type="text" id="cheque_date" name="cheque_date" class="form-control datepicker" placeholder="Enter Date " value="{{ old('cheque_date') }}" >
-		                        </div>
-		                    </div>
-	                    </div>
-	                	<div class="col-sm-6 ">
-		                    <label for="bank">Bank</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="bank" name="bank" class="form-control" placeholder="Enter bank name" value="{{ old('bank') }}" >
-		                        </div>
+									<select class="form-control show-tick" id="company_bank" name="company_bank">
+			                            <option >select</option>
+			                            @foreach($bank as $list)
+			                            <option value="{{$list->id}}">{{$list->name}}</option>
+			                            @endforeach
+			                        </select>		                        
+			                    </div>
 		                    </div>
 	                    </div>
 	                    <div class="col-sm-6 ">
@@ -128,21 +143,11 @@ function paymentMode(mode){
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <!-- <div class="col-sm-6 ">
-		                    <label for="party_name">Party Name</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="party_name" name="party_name" class="form-control" placeholder="Enter Party name" value="{{ old('party_name') }}" >
-		                        </div>
-		                    </div>
-	                    </div> -->
-	                </div>
-	                <div class="row clearfix">
 	                    <div class="col-sm-6 ">
-		                    <label for="location">Location</label>
+		                    <label for="location_id">Location</label>
 		                    <div class="form-group">
 			                    <div class="form-line">
-			                        <select class="form-control show-tick" id="location" name="location" @if(Auth::user()->user_type == 3 && Auth::user()->user_type == 4) disabled @endif>
+			                        <select class="form-control show-tick" id="location_id" name="location_id" @if(Auth::user()->user_type == 3 || Auth::user()->user_type == 4) disabled @endif>
 			                            <option >select</option>
 			                            @foreach($workshop as $list)
 			                            <option value="{{$list->id}}" @if(Auth::user()->workshop_id == $list->id) selected @endif >{{$list->name}}</option>
@@ -151,51 +156,84 @@ function paymentMode(mode){
 		                    	</div>
 	                    	</div>
 	                    </div>
-	                    <div class="col-sm-6">
+	                    <div class="col-sm-3">
 		                    <label for="mode">Mode Of Payment</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
 		                            <select class="form-control show-tick" id="mode" name="mode" onchange="paymentMode(this.value);" required>
-		                            	<option value="">-- Please select mode of payment --</option>
+		                            	<option value="">Please select mode of payment</option>
 			                            <option value="1">Cash</option>
 			                            <option value="2">Cheque</option>
-			                            <option value="3">Transfer(CC/DC/Online)</option>
+			                            <option value="3">Card(CC/DC/Online)</option>
+			                            <option value="4">Direct Transfer(NEFT/IMPS)</option>
 			                        </select>
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-3 acc_no">
-		                    <label for="acc_no">Card No</label>
+	                    <div class="col-sm-3 dod">
+		                    <label for="date">Payment/Cheque Received Date</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                            <input type="text" id="acc_no" name="acc_no" class="form-control" placeholder="Enter card no" value="{{ old('acc_no') }}">
+		                            <input type="text" id="date" name="date" class="form-control datepicker" placeholder="Enter Date " value="{{ old('date') }}" >
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-3 ifsc">
-		                    <label for="ifsc">Name</label>
+	                    <div class="col-sm-3 card_no">
+		                    <label for="card_no">Card Number/Batch Number</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                            <input type="text" id="ifsc" name="ifsc" class="form-control" placeholder="Enter Name of card holder" value="{{ old('ifsc') }}">
+		                            <input type="text" id="card_no" name="card_no" class="form-control" placeholder="Enter card no" value="{{ old('card_no') }}">
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-3 txn_no">
-		                    <label for="txn_no">Cheque/Transaction No.</label>
+	                    <!-- <div class="col-sm-3 batch_no">
+		                    <label for="batch_no">Batch No</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
-		                            <input type="text" id="txn_no" name="txn_no" class="form-control" placeholder="Enter Payment ID" value="{{ old('txn_no') }}">
+		                            <input type="text" id="batch_no" name="batch_no" class="form-control" placeholder="Enter card no" value="{{ old('batch_no') }}">
+		                        </div>
+		                    </div>
+	                    </div> -->
+	                    <div class="col-sm-3 actual_amt">
+		                    <label for="actual_amt">Actual Amount</label>
+		                    <div class="form-group">
+		                        <div class="form-line">
+		                            <input type="text" id="actual_amt" name="actual_amt" class="form-control" placeholder="Enter card no" value="{{ old('actual_amt') }}">
+		                        </div>
+		                    </div>
+	                    </div>
+	                    <div class="col-sm-3 party_name">
+		                    <label for="party_name">Party Name</label>
+		                    <div class="form-group">
+		                        <div class="form-line">
+		                            <input type="text" id="party_name" name="party_name" class="form-control" placeholder="Enter Name of card holder" value="{{ old('party_name') }}">
+		                        </div>
+		                    </div>
+	                    </div>
+	                    <div class="col-sm-3 ref_no">
+		                    <label for="ref_no">Cheque/Ref No.</label>
+		                    <div class="form-group">
+		                        <div class="form-line">
+		                            <input type="text" id="ref_no" name="ref_no" class="form-control" placeholder="Enter Payment ID" value="{{ old('ref_no') }}">
+		                        </div>
+		                    </div>
+	                    </div>
+	                    <div class="col-sm-3 cheque_bank">
+		                    <label for="cheque_bank">Bank Name</label>
+		                    <div class="form-group">
+		                        <div class="form-line">
+		                            <input type="text" id="cheque_bank" name="cheque_bank" class="form-control" placeholder="Enter bank name of Cheque" value="{{ old('cheque_bank') }}">
 		                        </div>
 		                    </div>
 	                    </div>
 	                </div>
 	                <div class="row clearfix">
 	                    <div class="col-sm-6 ">
-		                    <label for="voucher_img">Upload Document</label>
+		                    <label for="document">Upload Document</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
 	                                <div class="fallback">
-	                                    <input name="voucher_img" id="voucher_img" class="form-control" type="file" placeholder="img only" accept="image/x-png,image/gif,image/jpeg" />
+	                                    <input name="document" id="document" class="form-control" type="file" placeholder="img only" accept="image/x-png,image/gif,image/jpeg" />
 	                                </div>
 			                    </div>
 		                    </div>

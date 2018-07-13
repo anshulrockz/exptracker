@@ -99,10 +99,10 @@
                             <tr>
                                 <td>{{date_format(date_create($list->created_at),"m/d/y")}}</td>
                                 <td>{{++$key}}</td>
-                                <td>{{$list->txn_id}}</td>
+                                <td>{{$list->uid}}</td>
                                 <td>{{$list->location}}</td>
                                 <td>{{date_format(date_create($list->created_at),"d/m/yy")}}</td>
-                                <td>{{date_format(date_create($list->date),"d/m/Y")}}</td>
+                                <td>{{date_format(date_create($list->date_received),"d/m/Y")}}</td>
                                 <td>
                                     @if($list->mode==1) Cash
                                     @elseif($list->mode==2) Cheque

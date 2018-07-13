@@ -22,10 +22,16 @@ Route::match(['get', 'post'], 'register', function(){
 Auth::routes();
 
 //Route::get('/', 'HomeController@index')->name('home');
+Route::resource('/claim', 'ClaimController');
+
+//Route::get('/', 'HomeController@index')->name('home');
 Route::get('/dashboard', 'HomeController@index')->name('home');
 
 //Reports
 Route::get('report/expenses', 'ReportController@expense');
+Route::get('/report/deposits', 'ReportController@deposit');
+Route::get('/report/cheques', 'ReportController@cheque');
+Route::get('report/received-payments', 'ReportController@received_payment');
 
 //Expense
 Route::get('user-deposit/payeename', 'DepositController@payeename');
@@ -37,18 +43,16 @@ Route::resource('/deposits', 'DepositController');
 
 //Payment Vendor
 Route::get('payment-vendors/ajax','PaymentVendorController@id_ajax');
-Route::post('/payment-vendors/return/{id}', 'PaymentVendorController@return');
+Route::post('/payment-vendors/summary/{id}', 'PaymentVendorController@summary');
 Route::resource('/payment-vendors', 'PaymentVendorController');
 
 //Payment Others
-Route::resource('payment/others', 'PaymentOtherController');
-Route::post('cheques/payment', 'PaymentOtherController@payment');
-Route::post('cheques/change-status', 'PaymentOtherController@changeStatus');
+Route::get('payment/others/cheque-status/{id}', 'ReceivedPaymentController@chequeStatus');
+Route::post('payment/others/change-status', 'ReceivedPaymentController@changeStatus');
+Route::resource('received-payments', 'ReceivedPaymentController');
 
-//Payment NEFT
-Route::resource('payment/nefts', 'PaymentNeftController');
-Route::post('cashs/payment', 'PaymentNeftController@payment');
-Route::get('cashs/change-status/{id}', 'PaymentNeftController@changeStatus');
+//job details
+Route::resource('job-details', 'JobDetailController');
 
 //Payment History
 Route::resource('payment/history', 'PaymentHistoryController');
@@ -72,7 +76,7 @@ Route::get('/subexpenses/ajax','SubExpenseController@id_ajax');
 Route::group(['middleware' => 'CheckAdmin'], function() {
 	
 	//Reports
-	Route::get('/report/deposits', 'ReportController@deposit');
+	// Route::get('/report/deposits', 'ReportController@deposit');
 	//Route::get('/report/expenses', 'ReportController@expense');
 	Route::get('/report/assets', 'ReportController@asset');
 	//Route::get('/report/ledgers', 'ReportController@ledger');

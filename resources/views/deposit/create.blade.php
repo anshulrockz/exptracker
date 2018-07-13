@@ -141,6 +141,22 @@ function paymentMode(mode){
                 <form method="post" action="{{route('deposits.store')}}">
                 	{{ csrf_field() }}
                 	 <div class="row clearfix">
+                	 	<div class="col-sm-3">
+	                		<label for="voucher_no">Unique Id(auto)</label>
+		                    <div class="form-group form-float">
+		                        <div class="form-line ">
+		                            <input type="text" id="voucher_no" name="voucher_no" class="form-control" placeholder="Enter voucher number" value="{{ $voucher_no }}" readonly>
+		                        </div>
+		                    </div>
+	                    </div>
+                	 	<div class="col-sm-3">
+		                    <label for="voucher_date">Date</label>
+		                    <div class="form-group form-float">
+		                        <div class="form-line ">
+		                            <input type="text" id="voucher_date" name="voucher_date" class="form-control" placeholder="Enter Date Of voucher" value="{{  date('d F Y') }}" readonly>
+		                        </div>
+		                    </div>
+	                    </div>
                 	 	@if(Auth::user()->user_type==1 || Auth::user()->user_type==5)
 	                    <div class="col-sm-6">
 		                    <label for="company">Company</label>
@@ -270,6 +286,9 @@ function paymentMode(mode){
 <!-- Moment Plugin Js -->
 <script src="{{ asset('bsb/plugins/momentjs/moment.js')}}"></script>
 
+<!-- Jquery CountTo Plugin Js -->
+    <script src="../../../plugins/jquery-countto/jquery.countTo.js"></script>
+
 <!-- Bootstrap Material Datetime Picker Plugin Js -->
 <script src="{{ asset('bsb/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js')}}"></script>
 
@@ -281,8 +300,5 @@ function paymentMode(mode){
         time: false
     });
 </script>
-    
-<!--<!-- Select Plugin Js ->
-<script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>-->
 
 @endsection

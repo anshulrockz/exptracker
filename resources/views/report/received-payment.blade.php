@@ -73,12 +73,13 @@
                             <tr>
                                 <th>Created At</th>
                                 <th>Sr. No.</th>
-                                <th>Unique ID</th>
                                 <th>Location</th>
                                 <th>Date</th>
                                 <th>Payment Date</th>
                                 <th>Payment Mode</th>
-                                <th>Payee</th>
+                                <th>Cheque No.</th>
+                                <th>Party Name</th>
+                                <th>Cheque Bank</th>
                                 <th>Amount</th>
                             </tr>
                         </thead>
@@ -98,18 +99,19 @@
                         	@foreach( $report as $key=>$list)
                             <tr>
                                 <td>{{date_format(date_create($list->created_at),"m/d/y")}}</td>
-                                <td>{{++$key}}</td>
-                                <td>{{$list->txn_id}}</td>
+                                <td>{{$list->uid}}</td>
                                 <td>{{$list->location}}</td>
-                                <td>{{date_format(date_create($list->created_at),"d/m/yy")}}</td>
-                                <td>{{date_format(date_create($list->date),"d/m/Y")}}</td>
+                                <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
+                                <td>{{date_format(date_create($list->date_received),"d/m/Y")}}</td>
                                 <td>
                                     @if($list->mode==1) Cash
                                     @elseif($list->mode==2) Cheque
                                     @elseif($list->mode==3) Transfer
                                     @endif
                                 </td>
-                                <td>{{$list->user}}</td>
+                                <td>{{$list->ref_no}}</td>
+                                <td>{{$list->party_name}}</td>
+                                <td>{{$list->cheque_bank}}</td>
                                 <td>{{$list->amount}}</td>
                             </tr>
                             @endforeach

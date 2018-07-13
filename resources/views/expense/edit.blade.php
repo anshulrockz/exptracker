@@ -23,19 +23,16 @@ $( document ).ready(function() {
 	$(".addTable").hide();
 });
 
-
-
 $(function() {
     $("#form-edit").click(function() {
-     	$("#form input").prop("disabled", false);
-     	$("#form select").prop("disabled", false);
-    	$("#form textarea").prop("disabled", false);
-    	$("#form-save").prop("disabled", false);
+    	$("#form input, #form select, #form textarea, #form-save").prop("disabled", false);
+    	$("#radio_1, #radio_2").prop("disabled", true);
     	@if(Auth::user()->user_type == 4 || Auth::user()->user_type == 3)
     	$("#location").prop("disabled", true);
     	@endif
     	$(".delete-row").removeAttr("style");
     	$(".addTable").show();
+    	$('#expense_category_main, #vendor_id, #location').selectpicker('refresh');
     });
 });
 
@@ -64,6 +61,7 @@ $("#expense_category_main").change(function(){
 		                selOpts += "<option value='"+id+"'>"+val+"</option>";
 		            }
 		            $('#description_main').append(selOpts);
+					$('#description_main').selectpicker('refresh');
 				}
 				else{
 					$('#description_main option').remove();
@@ -79,193 +77,6 @@ $("#expense_category_main").change(function(){
 </script>
 
 <script>
-
-// $(function(){
-// 	$(".add-row").click(function(){
-// 		var id = $('#expense_category_main option:selected').val();
-//     	var reason = $('#reason_main').val(); 
-//     	var cost = $('#cost_main').val();
-//     	var quantity = $('#quantity_main').val();
-//     	// var discount = $('#discount').val();
-
-//     	if(id == ''){ alert("Please select category") }
-// 		else if(reason == ''){ alert("Please enter Description") }
-// 		else if(cost == ''){ alert("Please enter base value") }
-// 		else if(quantity == ''){ alert("Please enter quantity") }
-
-// 		else{
-// 			$.ajax({
-// 				type: "GET",
-// 				url: "{{url('expense-categories/ajax')}}",
-// 				data:'id='+id,
-// 				success: function(data){
-// 					var data = JSON.parse(data); 
-// 					//console.log(data);
-// 					var supply_type = data.supply_type; 
-// 	                var category = data.supply_category;
-// 	                var expense_category = data.name;
-// 	                var sgst = 0;
-// 		        	var cgst = 0;
-// 		        	var igst = 0;
-// 		        	var total_cost = 0; 
-// 		        	var total_sgst = 0; 
-// 		        	var total_cgst = 0; 
-// 		        	var total_igst = 0; 
-// 					var total_amount = 0; 
-// 		        	//var type = $('#supply_type_main option:selected').text();
-// 		        	//var category = $('#supply_category_main option:selected').text();
-// 		        	var description = $('#description_main option:selected').text(); 
-// 		        	var reason = $('#reason_main').val(); 
-// 		        	var code = $('#code_main').val();
-// 		        	var cost = $('#cost_main').val();
-// 		        	var quantity = $('#quantity_main').val();
-// 		        	var tax = $('#tax_main').val();
-		        	
-// 		        	if(cost < 0) cost = 0;
-// 		        	if(quantity < 0) quantity = 0;
-
-// 		        	if ($("#radio_1:checked").val() == '1') {
-// 		                sgst = (cost*quantity*tax)/200;
-// 						cgst = (cost*quantity*tax)/200;
-
-// 						$('.sgst_tr').show();
-// 						$('.cgst_tr').show();
-// 						$('.igst_tr').hide();
-// 		            }
-// 					if ($("#radio_2:checked").val() == '2') {
-// 		               igst = (cost*quantity*tax)/100;
-
-// 		               	$('.sgst_tr').hide();
-// 						$('.cgst_tr').hide();
-// 						$('.igst_tr').show();
-// 		            }
-// 		            abt = parseFloat(cost*quantity);
-// 				    amount = parseFloat(cost*quantity)+parseFloat(sgst)+parseFloat(cgst)+parseFloat(igst);
-// 				    amount = parseFloat(amount).toFixed(2);
-
-// 		        	var delBtn = '<button type="button" class="btn btn-danger btn-xs m-t-15 waves-effect delete-row"><i class="material-icons">remove_circle</i></button>';
-
-// 		            var markup = "<tr><td>"+supply_type+"<input name='type[]' class='form-control' type='hidden' value='"+supply_type+"'  /></td><td>"+category+"<input name='category[]' class='form-control' type='hidden' value='"+category+"'  /></td><td>"+expense_category+"<input name='expense_category[]' class='form-control' type='hidden' value='"+expense_category+"'  /></td><td>"+description+"<input name='description[]' class='form-control' type='hidden' value='"+description+"' /></td><td>"+reason+"<input name='reason[]' class='form-control' type='hidden' value='"+reason+"'  /></td><td>"+code+"<input name='code[]' class='form-control' type='hidden' value='"+code+"'  /></td><td class='cost_td'>"+cost+"<input name='cost[]' class='form-control cost1' type='hidden' value='"+cost+"'  /><input name='tax[]' class='form-control' type='hidden' value='"+tax+"'/></td><td class='quantity_td'>"+quantity+"<input name='quantity[]' class='form-control quantity' type='hidden' value='"+quantity+"'  /></td><td class='abt_td'>"+abt+"<input name='abt[]' class='form-control abt' type='hidden' value='"+abt+"'  /></td> <td class='sgst_td'> "+sgst+"<input name='sgst[]' class='form-control sgst' type='hidden' value='"+sgst+"'  />  </td><td class='tax_amount_td'>"+cgst+"<input name='cgst[]' class='form-control cgst' type='hidden' value='"+cgst+"' />  </td><td class='tax_amount_td'>"+igst+" <input name='igst[]' class='form-control igst' type='hidden' value='"+igst+"'  />  </td> <td class='amount_td'> "+amount+" <input name='amount[]' class='form-control unamount1' type='hidden' value='"+amount+"' /> </td><td>"+delBtn+"</td></tr>";
-									  
-// 		            $(".data-field").append(markup);
-
-		            
-// 		            $("input[class *= 'abt']").each(function(){
-// 			        	total_cost += +$(this).val();
-// 			    	}); 
-// 		            $("input[class *= 'sgst']").each(function(){
-// 			        	total_sgst += +$(this).val();
-// 			    	});
-// 			    	$("input[class *= 'cgst']").each(function(){
-// 			        	total_cgst += +$(this).val();
-// 			    	});
-// 			    	$("input[class *= 'igst']").each(function(){
-// 			        	total_igst += +$(this).val();
-// 			    	});
-// 			    	$("input[class *= 'unamount']").each(function(){
-// 			    		total_amount += +$(this).val(); 
-// 			    	}); 
-
-// 			    	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-// 			    	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-// 			    	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-// 			    	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-// 					$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
-
-// 					$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
-// 			    	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
-// 			    	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
-// 			    	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
-// 			    	$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
-// 					// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
-
-					
-
-// 	        	}
-// 			});
-// 		}
-//     });
-
-//     $('.data-field').on('click', '.delete-row', function(e){
-// 		e.preventDefault();
-		
-// 		var temp = $(this).closest("td").find('input[type="checkbox"]').val(); 
-// 		if(temp>0)
-// 		{ 
-// 			var markup = '<input name="delRow[]" class="form-control " type="hidden" value="'+temp+'"/>'
-// 			$("#deletedRow").append(markup);
-// 		}
-		
-// 		$(this).closest("tr").remove();
-
-// 		var total_cost = 0; 
-//     	var total_sgst = 0; 
-//     	var total_cgst = 0; 
-//     	var total_igst = 0; 
-// 		var total_amount = 0;
-
-// 		$("input[class *= 'abt']").each(function(){
-//         	total_cost += +$(this).val();
-//     	});  
-//         $("input[class *= 'sgst']").each(function(){
-//         	total_sgst += +$(this).val();
-//     	});
-//     	$("input[class *= 'cgst']").each(function(){
-//         	total_cgst += +$(this).val();
-//     	});
-//     	$("input[class *= 'igst']").each(function(){
-//         	total_igst += +$(this).val();
-//     	});
-//     	$("input[class *= 'unamount']").each(function(){
-//     		total_amount += +$(this).val(); 
-//     	});
-
-//     	if ($("#round_off").prop("checked")==true) {
-//             //total_amount = $('#total_amount').val();
-// 			total_amount = parseFloat(total_amount).toFixed(0);
-//         }
-
-//     	// discount = $('#discount').val();
-
-// 		$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-//     	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-//     	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-//     	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-// 		$('input#total_amount').val(parseFloat(total_amount).toFixed(2));
-
-//     	$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
-//     	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
-//     	$('.cgst_amount_td').html(parseFloat(total_cgst).toFixed(2));
-//     	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
-//     	$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
-// 		// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
-// 	});
-
-// 	$("#round_off").change(function(){
-// 		if ($("#round_off").prop("checked")==true) {
-//             var total_amount = $('#total_amount').val();
-// 			total_amount = parseFloat(total_amount).toFixed(0);
-//         }
-// 		if ($("#round_off").prop("checked")==false) {
-//            total_amount = 0;
-//            $("input[class *= 'unamount']").each(function(){
-// 	    		total_amount += +$(this).val(); 
-// 	    	});
-//         }
-// 		$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
-// 	});
-
-// 	// $('#discount').on('keyup', function(e){
-// 	// 	e.preventDefault();
-		
-		
-//  //    	var discount = $('#discount').val(); 
-//  //    	var total_amount = $('#total_amount').val();
-
-// 	// 	$('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
-		
-// 	// }); 
-// }); 
 
 $(function(){
 	$("#radio_3").change(function(){
@@ -314,10 +125,7 @@ $(function(){
 		        	var total_cgst = 0; 
 		        	var total_igst = 0; 
 					var total_amount = 0; 
-		        	//var type = $('#supply_type_main option:selected').text();
-		        	//var category = $('#supply_category_main option:selected').text();
-		        	//var description = $('#description_main option:selected').text(); 
-		        	// var code = $('#code_main').val();
+					
 		        	var tax = $('#tax_main').val();
 		        	
 		        	if(cost < 0) cost = 0;
@@ -369,19 +177,11 @@ $(function(){
 						total_amount = parseFloat(total_amount).toFixed(0);
 			        }
 
-			  //   	$('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-			  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-			  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-			  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-					// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
-
 					$('.amount_before_tax_td').html(parseFloat(total_cost));
 			    	$('.sgst_amount_td').html(parseFloat(total_sgst));
 			    	$('.cgst_amount_td').html(parseFloat(total_cgst));
 			    	$('.igst_amount_td').html(parseFloat(total_igst));
 					$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(5)+'"/>');
-					// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
-
 					$('#radio_1').prop('disabled',true);
 		        	$('#radio_2').prop('disabled',true);
 		        	$('.dataTable').show();
@@ -430,13 +230,6 @@ $(function(){
             //total_amount = $('#total_amount').val();
 			total_amount = parseFloat(total_amount).toFixed(0);
         }
-    	// discount = $('#discount').val();
-    	
-		// $('input#amount_before_tax').val(parseFloat(total_cost).toFixed(2));
-  //   	$('input#sgst_amount').val(parseFloat(total_sgst).toFixed(2));
-  //   	$('input#cgst_amount').val(parseFloat(total_cgst).toFixed(2));
-  //   	$('input#igst_amount').val(parseFloat(total_igst).toFixed(2));
-		// $('input#total_amount').val(parseFloat(total_amount).toFixed(2));
 
     	$('.amount_before_tax_td').html(parseFloat(total_cost).toFixed(2));
     	$('.sgst_amount_td').html(parseFloat(total_sgst).toFixed(2));
@@ -444,7 +237,7 @@ $(function(){
     	$('.igst_amount_td').html(parseFloat(total_igst).toFixed(2));
     	$('.total_amount_td').html(parseFloat(total_amount).toFixed(2)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount).toFixed(2)+'"/>');
     	$('#deletedRow').append('<input name="delRow[]" class="form-control " type="hidden" value="'+del+'"/>');
-		// $('.total_discount_td').html(parseFloat(total_amount-discount).toFixed(2)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount).toFixed(2)+'"/>');
+
 	});
 
 	$("#round_off").change(function(){
@@ -551,23 +344,20 @@ $(document).ready(function() {
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-6 ">
-		                    <label for="party_name">Seller Name</label>
-		                    <div class="form-group form-float">
-		                        <div class="form-line ">
-		                            <input type="text" id="party_name" name="party_name" class="form-control" placeholder="Enter sarty name" value="{{ $expense->party_name }}" >
-		                        </div>
-		                    </div>
+	                    <div class="col-sm-3 ">
+		                    <label for="vendor_id">Vendor Name</label>
+		                    <div class="form-group">
+			                    <div class="form-line">
+			                        <select class="form-control show-tick" id="vendor_id" name="vendor_id" data-live-search="true" required>
+			                            <option value="" >-- Please select Vendor --</option>
+			                            @foreach($vendor as $list)
+			                            <option value="{{$list->id}}" @if($expense->party_name == $list->name) selected @endif >{{$list->name}}  (GSTIN-{{$list->gst}})</option>
+			                            @endforeach
+			                        </select>
+		                    	</div>
+	                    	</div>
 	                    </div>
-	                    <div class="col-sm-6 ">
-		                    <label for="party_gstin">Party GSTIN</label>
-		                    <div class="form-group form-float">
-		                        <div class="form-line ">
-		                            <input type="text" id="party_gstin" name="party_gstin" class="form-control" placeholder="Enter party_gstin " value="{{ $expense->party_gstin }}" >
-		                        </div>
-		                    </div>
-	                    </div>
-	                    <div class="col-sm-3">
+	                    <!-- <div class="col-sm-3">
 		                    <label for="mode">Mode Of Payment</label>
 		                    <div class="form-group">
 		                        <div class="form-line">
@@ -577,7 +367,7 @@ $(document).ready(function() {
 			                        </select>
 		                        </div>
 		                    </div>
-	                    </div>
+	                    </div> -->
 	                    <div class="col-sm-3">
 		                    <label for="location">Location</label>
 		                    <div class="form-group">
@@ -613,7 +403,7 @@ $(document).ready(function() {
 		                </div>
 	                </div>
 	                <div class="row clearfix addTable">
-	                	<div class="col-sm-12" style="overflow:auto">
+	                	<div class="col-sm-12">
 			                <table class="table table-bordered table-striped table-hover" >
 		                        <thead>
 		                            <tr>
@@ -1041,7 +831,7 @@ $('.datepicker').bootstrapMaterialDatePicker({
 });
 </script>
     
-<!--<!-- Select Plugin Js ->
-<script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>-->
+<!-- Select Plugin Js -->
+<script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>
 
 @endsection

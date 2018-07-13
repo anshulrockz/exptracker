@@ -6,19 +6,19 @@
 <link href="{{ asset('bsb/plugins/bootstrap-select/css/bootstrap-select.css')}}" rel="stylesheet" />
 <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet"/>
 <link href="https://cdn.datatables.net/fixedheader/3.1.3/css/fixedHeader.dataTables.min.css" rel="stylesheet"/>
-    
+
 <div class="row clearfix">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
         	<div class="header">
                 <h2>
-                    Deposit
+                    Company
                 </h2>
             </div>
             <div class="body">
                 <ol class="breadcrumb breadcrumb-bg-pink">
                     <li><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="active">Deposit</li>
+                    <li class="active">Company</li>
                 </ol>
             </div>
         </div>
@@ -26,9 +26,9 @@
 </div>
 
 <div class="row clearfix">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        @include('layouts.flashmessage')
-    </div>
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		@include('layouts.flashmessage')
+	</div>
 </div>
 
 <div class="row clearfix">
@@ -38,39 +38,51 @@
                 <h2>
                     All
                 </h2>
-                <a class="btn btn-primary waves-effect header-dropdown m-r--5" href="{{ route('payment-vendors.create')}}">Pay Now</a>
+                <a class="btn btn-primary waves-effect header-dropdown m-r--5" href="{{ url('/companies/create')}}">Create New</a>
             </div>
             <div class="body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover js-basic-example dataTable">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Vendor Id</th>
-                                <th>Vendor Name</th>
-                                <th>Address</th>
+                                <th>Name</th>
+                                <th>Contact Person</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <!-- <th>Status</th> -->
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <!--  <tfoot>
+                        <!-- <tfoot>
                             <tr>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Amount</th>
-                                <th>Date</th>
-                                <th>Payment Mode</th>
+                                <th>Name</th>
+                                <th>Contact Person</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
-                        </tfoot>  -->
+                        </tfoot> -->
                         <tbody>
-                        	@foreach( $deposit as $key=>$list)
+                        	@foreach( $company as $key=>$list)
                             <tr>
-                                <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
-                                <td>{{$list->uid}} </td>
-                                <td>{{$list->user}} </td>
-                                <td>{{$list->address}}</td>
+                                <td>{{$list->name}}</td>
+                                <td>{{$list->contact_person}}</td>
+                                <td>{{$list->mobile}}</td>
+                                <td>{{$list->email}}</td>
+                                <!-- <td>
+                                	@if($list->status==1){{"Active"}}
+                                	@else {{"Inactive"}}
+                                	@endif
+                                </td> -->
                                 <td>
-                                    <a href="{{ url('payment-vendors/'.$list->vendor_id)}}" class="btn btn-xs btn-primary" title="Ledger"> <i class="material-icons">storage</i> </a>
+                                    <!-- <a href="{{ url('/companies/'.$list->id)}}" class="btn btn-sm btn-success"> View </a> -->
+                                    <a href="{{ url('/companies/'.$list->id.'/edit')}}" class="btn btn-sm btn-info"> <i class="material-icons">edit</i> </a>
+                                    <form style="display: inline;" method="post" action="{{route('companies.destroy',$list->id)}}">
+				                        {{ csrf_field() }}
+				                        {{ method_field('DELETE') }}
+				                        <button onclick="return confirm('Are you sure you want to Delete?');" type="submit" class="btn btn-sm btn-danger"><i class="material-icons">delete</i></button>
+				                    </form>
                                 </td>
                             </tr>
                             @endforeach
