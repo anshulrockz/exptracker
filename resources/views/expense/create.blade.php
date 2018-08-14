@@ -74,11 +74,14 @@ $(function(){
     	var quantity = $('#quantity_main').val();
     	var description = $('#description_main option:selected').text();
     	var code = $('#code_main').val();
+    	var vendor_id = $('#vendor_id option:selected').val();
     	// var discount = $('#discount').val();
+    	// alert(vendor_id);
  
 
-		if(id == ''){ alert("Please select category") }
-		if(description == '' || description == '--select--'){ alert("Please select sub category") }
+		if(vendor_id == '' || vendor_id == 0){ alert("Please select vendor") }
+		else if(id == ''){ alert("Please select category") }
+		else if(description == '' || description == '--select--'){ alert("Please select sub category") }
 		else if(reason == ''){ alert("Please enter Description") }
 		else if(cost == ''){ alert("Please enter base value") }
 		else if(quantity == ''){ alert("Please enter quantity") }
@@ -105,17 +108,17 @@ $(function(){
 		        	
 		        	if(cost < 0) cost = 0;
 		        	if(quantity < 0) quantity = 0;
-		        	if ($("#radio_1:checked").val() == '1') {
+		        	if ($("#tax_type").val() == '1') {
 		                sgst = (cost*quantity*tax)/200;
 						cgst = (cost*quantity*tax)/200;
-						$('#tax_type').val(1);
+						// $('#tax_type').val(1);
 						$('.sgst_tr').show();
 						$('.cgst_tr').show();
 						$('.igst_tr').hide();
 		            }
-					if ($("#radio_2:checked").val() == '2') {
-		               igst = (cost*quantity*tax)/100;
-						$('#tax_type').val(2);
+					else {
+		               	igst = (cost*quantity*tax)/100;
+						// $('#tax_type').val(2);
 		               	$('.sgst_tr').hide();
 						$('.cgst_tr').hide();
 						$('.igst_tr').show();
@@ -339,15 +342,17 @@ $(document).ready(function() {
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-3 ">
+	                    <div class="col-sm-6 ">
 		                    <label for="vendor_id">Vendor Name</label>
 		                    <div class="form-group">
 			                    <div class="form-line">
 			                        <select class="form-control show-tick" data-live-search="true" required id="vendor_id" name="vendor_id" >
+			                        	<option value="0">please select</option>
 			                            @foreach($vendor as $list)
 			                            <option value="{{$list->id}}"> {{$list->name}}  (GSTIN#{{$list->gst}}#)</option>
 			                            @endforeach
 			                        </select>
+			                        <input name="tax_type" id="tax_type" type="hidden" />
 		                    	</div>
 	                    	</div>
 	                    </div>
@@ -401,7 +406,7 @@ $(document).ready(function() {
 			                    </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-3 ">
+	                    <!-- <div class="col-sm-3 ">
 	                    	<label>Invoice Type</label>
 		                    <div class="form-line">
 		                        <input name="group1" type="radio" id="radio_1" value="1" checked />
@@ -410,7 +415,7 @@ $(document).ready(function() {
                                 <label for="radio_2">IGST</label>
                                 <input name="tax_type" id="tax_type" class="form-control" type="hidden" />
 		                    </div>
-		                </div>
+		                </div> -->
 	                </div>
 	                <div class="row clearfix">
 	                	<div class="col-sm-12 " >
@@ -651,11 +656,21 @@ $(document).ready(function() {
 	                </div>
 	                <div class="row clearfix">
 	                	<div class="col-sm-6">
-	                		<button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+	                		<button type="submit" id="form-save" class="btn btn-primary m-t-15 waves-effect">Save</button>
 	                	</div>
 	                </div>
             	</div>
-            </form>
+            </form><!-- 
+            <div class="preloader pl-size-xl">
+                <div class="spinner-layer">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -680,12 +695,6 @@ $('.datepicker').bootstrapMaterialDatePicker({
 <script>
   $( function() {
 
-    $( "#party_name" ).autocomplete({
-      source: '{{url('expenses/partyname')}}',
-      minLength:1,
-      maxLength:10
-    });
-
 	$("#vendor_id").change(function(){
 		@php $comapny = getAllFromID(Auth::user()->company_id, 'companies') @endphp
 		var company_gstin = "{{$comapny->gst}}"; 
@@ -693,14 +702,11 @@ $('.datepicker').bootstrapMaterialDatePicker({
 		var vendor_gstin = $( "#vendor_id option:selected" ).text().split('#');
 		var vendor_gstin_code = parseInt(vendor_gstin[1].substring(0,2));
 		if (company_gstin_code == vendor_gstin_code) {
-			$('#radio_1').attr('checked');
 			$('#tax_type').val(1);
 		}
 		else{
-			$('#radio_2').attr('checked');
 			$('#tax_type').val(2);
 		}
-		
 	});
 
     $( "#created_for" ).autocomplete({
@@ -730,7 +736,7 @@ $('.datepicker').bootstrapMaterialDatePicker({
 		$('#vendor_id').selectpicker('refresh');
 	});
   </script>
-    
+
  <!-- Select Plugin Js -->
 <script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>
 

@@ -186,6 +186,7 @@ $(function(){
 			                            <option value="3">Workshop Admin</option>
 			                            @endif
 			                            <option value="4">Workshop User</option>
+			                            <option value="6">Insurer</option>
 			                        </select>
 		                    	</div>
 	                    	</div>

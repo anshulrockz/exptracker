@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Report;
-use App\AssetNew;
-use App\Expense;
-use App\Deposit;
-use App\PaymentOther;
-use App\Transaction;
+use App\CustomerDetail;
+use App\ClaimCategory;
 
 class ReportController extends Controller
 {
@@ -34,12 +31,6 @@ class ReportController extends Controller
             $error = $e->getMessage();
             return back()->with('error', 'Something went wrong! Please contact admin');
         }
-    }
-    
-    public function cheque()
-    {
-    	$cheque = Report::all_cheques(); 
-        return view('report.cheque')->with('report', $cheque);
     }
 
 	public function asset()
@@ -68,6 +59,15 @@ class ReportController extends Controller
         return view('report.received-payment')->with('report', $transaction);
     }
 
+    public function claim()
+    {
+        $customer_detail = CustomerDetail::all_insrance_claims(); //dd($customer_detail);
+        $doc_verification = ClaimCategory::where('type_of_category','3')->get();
+        $kyc_verification = ClaimCategory::where('type_of_category','4')->get();   
+        return view('report.claim')->with(array('doc_verification' => $doc_verification,
+            'kyc_verification' => $kyc_verification, 'report'=> $customer_detail ));
+    }
+
 	public function overall()
     {
         try{
@@ -78,15 +78,6 @@ class ReportController extends Controller
             $error = $e->getMessage();
             return back()->with('error', 'Something went wrong! Please contact admin');
         }
-    }
-    
-    public function datatable_ajax(Request $request)
-    {
-        // $table_name = $request->table_name;
-        // $start_date = $request->start_date;
-        // $end_date = $request->end_date; die;
-        // $data = Expense::->whereBetween('created_at', array($from, $to))->get();
-        // print_r(json_encode($table_name));
     }
     
 }

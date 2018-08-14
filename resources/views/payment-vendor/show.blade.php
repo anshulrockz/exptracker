@@ -12,17 +12,29 @@
 <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet"/>
 <link href="https://cdn.datatables.net/fixedheader/3.1.3/css/fixedHeader.dataTables.min.css" rel="stylesheet"/>
 
-    
+<style type="text/css">
+    th{
+        text-align: center;
+    }
+    /*td:nth-child(1), td:nth-child(2){
+        text-align: center;
+    }*/
+    td:nth-child(6), td:nth-child(4), td:nth-child(5){
+        text-align: right;
+    }
+</style>
+
 <div class="row clearfix">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
         	<div class="header">
-                <h2 id="header">
-                    {{ getFromID(Auth::user()->company_id, 'companies') }}<br>
-                    {{ getFromID($vendor->location, 'workshops') }}<br>
-                    Vendor: {{ $vendor->name }}<br>
-                    Address: {{ $vendor->address }}<br>
-                </h2>
+                <!-- <h1>
+                    {{ getFromID(Auth::user()->company_id, 'companies') }}
+                    {{ getFromID($vendor->location, 'workshops') }}<br> 
+                </h1> -->
+                <h1>{{ $vendor->name }}</h1>
+                <h2>Address: {{ $vendor->address }}</h2>
+                <h2 id="header">Ledger</h2>
                 <a class="btn btn-primary waves-effect header-dropdown m-r--5" href="{{ url('payment-vendors/create?id='.$vendor->id)}}">Pay Now</a>
             </div>
             <div class="body">
@@ -44,23 +56,25 @@
                     <table class="table table-bordered table-striped table-hover dataTable">
                         <thead>
                             <tr>
+                                <!-- <th>Id</th> -->
                                 <th>Date</th>
                                 <th>Particulars</th>
                                 <th>Debit</th>
                                 <th>Credit</th>
                                 <th>Balance</th>
-                                <th>Action1</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach( $transaction as $key=>$list)
-                            <tr>
+                            <tr>                                
+                                <!-- <td>{{$list->id}}</td> -->
                                 <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
                                 <td>{{$list->particulars}}</td>
-                                <td style="text-align: right;">{{$list->debit}} </td>
-                                <td style="text-align: right;">{{$list->credit}} </td>
-                                <td style="text-align: right;">
-                                    {{$balance += $list->credit-$list->debit}}
+                                <td>{{$list->debit}} </td>
+                                <td>{{$list->credit}} </td>
+                                <td>
+                                    {{$balance += $list->debit - $list->credit}}
                                 </td>
                                 <td>
                                     <form style="display: inline;" method="post" action="{{route('payment-vendors.destroy',$list->id)}}">
@@ -109,18 +123,48 @@
 
 <!-- Select Plugin Js -->
     <script src="{{ asset('bsb/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>
+@php
 
+$company = getAllFromID(Auth::user()->company_id, "companies") ;
+$workshop = getAllFromID($vendor->location, "workshops") ;
+
+@endphp
 <script>
+
 $(document).ready(function() {
     var header = $("#header").html();
     document.title = header;
     $('.dataTable').DataTable({
+        "order": [[ 0, "desc" ]],
         dom: 'Bfrtip',
         responsive: true,
         buttons: [
-             'excel', 'print'
+            {
+                extend: 'print',
+                title: '',
+                exportOptions: {
+                    columns: [ 0, 1, 2, 3, 4 ]
+                },
+                customize: function ( win ) {
+                    $(win.document.body)
+                        .css( 'font-size', '10pt' )
+                        .prepend(
+                            '<h2 style="width:100%;text-align:center"><u>{{ $company->name }} </u><br> {{ $company->address }}</h2>' + 
+                            '<h2 style="width:100%;text-align:center">{{ $vendor->name }}</h2>' + 
+                            '<h3 style="width:100%;text-align:center"> {{ $vendor->address }} </h3>'
+                            // {{ $workshop->name }} <br>
+                        );
+ 
+                    $(win.document.body).find( 'table' )
+                        .addClass( 'compact' )
+                        .css( 'font-size', 'inherit' );
+                    
+                }
+            }
         ]
     });
+
+    $('.dataTable').column( 0 ).visible( false );
 } );
 </script>
 

@@ -32,7 +32,7 @@ $(function() {
     	@endif
     	$(".delete-row").removeAttr("style");
     	$(".addTable").show();
-    	$('#expense_category_main, #vendor_id, #location').selectpicker('refresh');
+    	$('#expense_category_main, #vendor_id, #location, #tax_main').selectpicker('refresh');
     });
 });
 
@@ -41,38 +41,38 @@ $(function() {
 <!-- AJAX DD Selecter for Location Js -->
 <script>
 $(function(){
-$("#expense_category_main").change(function(){
-	var id = $(this).val();
-	if(id != ''){
-		$('#description_main option').remove();
-		$.ajax({
-			type: "GET",
-			url: "{{url('/subexpenses/ajax')}}",
-			data:'id='+id,
-			success: function(data){
-				var data = JSON.parse(data);
-				var selOpts = "<option>-- select --</option>";
-				if(data.length >0){					
-					console.log(data);
-		            for (i=0;i<data.length;i++)
-		            {
-		                var id = data[i].id; 
-		                var val = data[i].name;
-		                selOpts += "<option value='"+id+"'>"+val+"</option>";
-		            }
-		            $('#description_main').append(selOpts);
-					$('#description_main').selectpicker('refresh');
+	$("#expense_category_main").change(function(){
+		var id = $(this).val();
+		if(id != ''){
+			$('#description_main option').remove();
+			$.ajax({
+				type: "GET",
+				url: "{{url('/subexpenses/ajax')}}",
+				data:'id='+id,
+				success: function(data){
+					var data = JSON.parse(data);
+					var selOpts = "<option>-- select --</option>";
+					if(data.length >0){					
+						console.log(data);
+			            for (i=0;i<data.length;i++)
+			            {
+			                var id = data[i].id; 
+			                var val = data[i].name;
+			                selOpts += "<option value='"+id+"'>"+val+"</option>";
+			            }
+			            $('#description_main').append(selOpts);
+						$('#description_main').selectpicker('refresh');
+					}
+					else{
+						$('#description_main option').remove();
+					}
 				}
-				else{
-					$('#description_main option').remove();
-				}
-			}
-		});
-	}
-	else{
-			$('#sub_expenses option').remove();
+			});
 		}
-});
+		else{
+				$('#sub_expenses option').remove();
+			}
+	});
 });
 </script>
 
@@ -130,7 +130,7 @@ $(function(){
 		        	
 		        	if(cost < 0) cost = 0;
 		        	if(quantity < 0) quantity = 0;
-		        	if ($("#radio_1:checked").val() == '1') {
+		        	if ($('#tax_type').val() == '1') {
 		                sgst = (cost*quantity*tax)/200;
 						cgst = (cost*quantity*tax)/200;
 						$('#tax_type').val(1);
@@ -138,9 +138,8 @@ $(function(){
 						$('.cgst_tr').show();
 						$('.igst_tr').hide();
 		            }
-					if ($("#radio_2:checked").val() == '2') {
+					else {
 		               igst = (cost*quantity*tax)/100;
-						$('#tax_type').val(2);
 		               	$('.sgst_tr').hide();
 						$('.cgst_tr').hide();
 						$('.igst_tr').show();
@@ -301,7 +300,6 @@ $(document).ready(function() {
                 <b>
 	                @if($balance)
 	                Balance({{$balance}})
-	               
 	                @endif
                 </b>
             </div>
@@ -344,16 +342,17 @@ $(document).ready(function() {
 		                        </div>
 		                    </div>
 	                    </div>
-	                    <div class="col-sm-3 ">
+	                    <div class="col-sm-6 ">
 		                    <label for="vendor_id">Vendor Name</label>
 		                    <div class="form-group">
 			                    <div class="form-line">
 			                        <select class="form-control show-tick" id="vendor_id" name="vendor_id" data-live-search="true" required>
 			                            <option value="" >-- Please select Vendor --</option>
 			                            @foreach($vendor as $list)
-			                            <option value="{{$list->id}}" @if($expense->party_name == $list->name) selected @endif >{{$list->name}}  (GSTIN-{{$list->gst}})</option>
+			                            <option value="{{$list->id}}" @if($expense->party_name == $list->name) selected @endif >{{$list->name}}  (GSTIN#{{$list->gst}}#)</option>
 			                            @endforeach
 			                        </select>
+			                        <input name="tax_type" id="tax_type" type="hidden"  value="{{ $expense->inv_type }}" >
 		                    	</div>
 	                    	</div>
 	                    </div>
@@ -391,16 +390,15 @@ $(document).ready(function() {
 			                    </div>
 		                    </div>
 	                    </div>
-	                     <div class="col-sm-3 ">
+	                    <!-- <div class="col-sm-3 ">
 	                    	<label>Invoice Type</label>
 		                    <div class="form-line">
 		                        <input name="group1" type="radio" id="radio_1" value="1" disabled />
                                 <label for="radio_1">GST</label>
                                 <input name="group1" type="radio" id="radio_2" value="2" disabled />
                                 <label for="radio_2">IGST</label>
-                                <input name="tax_type" id="tax_type" class="form-control" type="hidden"  />
 		                    </div>
-		                </div>
+		                </div> -->
 	                </div>
 	                <div class="row clearfix addTable">
 	                	<div class="col-sm-12">
@@ -521,7 +519,6 @@ $(document).ready(function() {
 			                <table class="table table-bordered table-striped table-hover dataTable" >
 		                        <thead>
 		                            <tr>
-		                                <!-- <th></th> -->
 		                                <th >Supply Type</th>
 		                                <th >Supply Cat.</th>
 		                                <th >Exp Cat.</th>
@@ -531,9 +528,9 @@ $(document).ready(function() {
 		                                <th >Base Value</th>
 		                                <th >Quantity</th>
 		                                <th >Amount</th>
-		                                <th >SGST</th>
-		                                <th >CGST</th>
-		                                <th >IGST</th>
+		                                <th class="sgst_td">SGST</th>
+		                                <th class="cgst_td">CGST</th>
+		                                <th class="igst_td">IGST</th>
 		                                <th >Total</th>
 		                                <th >Action</th>
 		                            </tr>
@@ -545,11 +542,10 @@ $(document).ready(function() {
 		                        	@foreach( $expense_details as $key=>$expense_details)
 		                        	@php 
 		                        		
-		                        		$total_cost = $expense_details->cost*$expense_details->quantity;
+		                        		$total_cost = $expense_details->cost * $expense_details->quantity;
 		                        		$total_sgst += $expense_details->sgst;
 		                        		$total_cgst += $expense_details->cgst;
 		                        		$total_igst += $expense_details->igst;
-		                        		
 
 		                        	@endphp
 		                            <tr>
@@ -559,53 +555,55 @@ $(document).ready(function() {
 		                            	</td> -->
 		                            	<td>
 		                            		{{$expense_details->category1}}
-		                            		<input class="form-control " type="hidden" value="'{{$expense_details->category1}}'"  />
+		                            		<input class="form-control " name="type[]" type="hidden" value="'{{$expense_details->category1}}'"  />
 		                            	</td>
 		                            	<td>
 		                            		{{$expense_details->category2}}
-		                            		<input class="form-control " type="hidden" value="{{$expense_details->category2}}"  />
+		                            		<input class="form-control " name="category[]" type="hidden" value="{{$expense_details->category2}}"  />
 		                            	</td>
 		                            	<td>
 		                            		{{$expense_details->category3}}
-		                            		<input class="form-control " type="hidden" value="'+expense_category+'"  />
+		                            		<input class="form-control " name="expense_category[]" type="hidden" value="{{$expense_details->category3}}"  />
 		                            	</td>
 		                            	<td>
 		                            		{{$expense_details->description}}
-		                            		<input class="form-control " type="hidden" value="{{$expense_details->description}}" />
+		                            		<input class="form-control " name="description[]" type="hidden" value="{{$expense_details->description}}" />
 		                            	</td>
 		                            	<td>
 		                            		{{$expense_details->reason}}
-		                            		<input class="form-control " type="hidden" value="{{$expense_details->reason}}" />
+		                            		<input class="form-control " name="reason[]" type="hidden" value="{{$expense_details->reason}}" />
 		                            	</td>
 		                            	<td>{{$expense_details->code}}
-		                            		<input class="form-control " type="hidden" value="'+code+'"  />
+		                            		<input class="form-control " name="code[]" type="hidden" value="{{$expense_details->code}}"  />
 		                            	</td>
 		                            	<td class="cost_td">
 		                            		{{$expense_details->cost}}
-		                            		<input class="form-control cost1" type="hidden" value="{{$expense_details->cost}}"  />
+		                            		<input class="form-control cost1" name="cost[]" type="hidden" value="{{$expense_details->cost}}"  />
+		                            		<input name='tax[]' class='form-control' type='hidden' value="{{$expense_details->tax_value}}">
 		                            	</td>
 		                            	<td class="quantity_td">
 		                            		{{$expense_details->quantity}}
-		                            		<input class="form-control quantity" type="hidden" value="{{$expense_details->quantity}}"  />
+		                            		<input class="form-control quantity" name="quantity[]" type="hidden" value="{{$expense_details->quantity}}"  />
 		                            	</td>
 		                            	<td class="abt_td">
 		                            		{{$expense_details->quantity*$expense_details->cost}}
-		                            		<input class="form-control abt" type="hidden" value="{{$expense_details->quantity*$expense_details->cost}}"  />
+		                            		<input class="form-control abt" name="abt[]" type="hidden" value="{{$expense_details->quantity*$expense_details->cost}}"  />
 		                            	</td>
 		                            	 <td class="sgst_td">
 		                            	 	{{$expense_details->sgst}}
-		                            	 	<input class="form-control sgst" type="hidden" value="{{$expense_details->sgst}}"  />  
+		                            	 	<input class="form-control sgst" name="sgst[]" type="hidden" value="{{$expense_details->sgst}}"  />  
 		                            	 </td>
 		                            	 <td class="cgst_td">
 		                            	 	{{$expense_details->cgst}}
-		                            	 	<input class="form-control cgst" type="hidden" value="{{$expense_details->cgst}}" />  
+		                            	 	<input class="form-control cgst" name="cgst[]" type="hidden" value="{{$expense_details->cgst}}" />  
 		                            	 </td>
 		                            	 <td class="igst_td">
 		                            	 	{{$expense_details->igst}}
-		                            	 	<input class="form-control igst" type="hidden" value="{{$expense_details->igst}}"  />  
+		                            	 	<input class="form-control igst" name="igst[]" type="hidden" value="{{$expense_details->igst}}"  />  
 		                            	 </td> 
 		                            	 <td class="amount_td"> 
-		                            	 	{{ $total_cost + $expense_details->sgst + $expense_details->cgst + $expense_details->igst }} <input class="form-control unamount" type="hidden" value="{{ $total_cost + $expense_details->sgst + $expense_details->cgst + $expense_details->igst}}" /> 
+		                            	 	{{ $total_cost + $expense_details->sgst + $expense_details->cgst + $expense_details->igst }} 
+		                            	 	<input class="form-control unamount" type="hidden" value="{{ $total_cost + $expense_details->sgst + $expense_details->cgst + $expense_details->igst}}" /> 
 		                            	 </td>
 		                            	 <td>
 		                            	 	<input type="checkbox" class="filled-in" value="{{$expense_details->id}}"  name="" checked />
@@ -614,7 +612,6 @@ $(document).ready(function() {
 		                            </tr>
 		                            @endforeach
 		                        </tbody>
-		                        <tfoot class="final_amount">
 		                            <tr>
 		                            	<th colspan="12" style="text-align: right;">Amount Before Tax</th>
 		                            	<td class="amount_before_tax_td">
@@ -641,7 +638,7 @@ $(document).ready(function() {
 					                	</td>
 					                	<th></th>
 		                            </tr> -->
-		                            @if( $expense->inv_type == 1 )
+		                            
 		                            <tr class="sgst_tr">
 		                            	<th colspan="12" style="text-align:right;">SGST Amount</th>
 		                            	<td class="sgst_amount_td">
@@ -668,7 +665,7 @@ $(document).ready(function() {
 						                    </div> -->
 					                	</td>
 		                            </tr>
-		                            @else
+		                            
 		                            <tr class="igst_tr">
 		                            	<th colspan="12" style="text-align: right;">IGST Amount</th>
 		                            	<td class="igst_amount_td">
@@ -682,7 +679,7 @@ $(document).ready(function() {
 						                    </div> -->
 					                	</td>
 		                            </tr>
-		                            @endif
+		                            
 		                            <tr class="">
 		                            	<th colspan="12" style="text-align: right;">Total Amount</th>
 		                            	<td class="total_amount_td">
@@ -746,17 +743,18 @@ $(document).ready(function() {
 	                		@if($days<1) 
 	                		<button type="submit" id="form-save" class="btn btn-primary waves-effect">Save</button>
 	                		<button type="button" id="form-edit" class="btn btn-primary waves-effect">Edit </button></br>
-	                		Note:You can edit only in 24hrs of creation 
-	                		@else Note: You cannot edit after 24hrs of creation.
 	                		@endif
+
+	                		Note:You can edit only in 24hrs of creation 
 	                	</div>
 	                </div>
-	               <div id="deletedRow"></div>
+	               <div id="deletedRow"></div>`
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 
 <script>
 	
@@ -796,23 +794,14 @@ $( document ).ready(function() {
 	if ($("#round_off").prop("checked")==true) {
 		total_amount = parseFloat(total_amount).toFixed(0);
     }
-	// discount = $('#discount').val();
-
-	$('input#amount_before_tax').val(parseFloat(total_cost));
-	$('input#sgst_amount').val(parseFloat(total_sgst));
-	$('input#cgst_amount').val(parseFloat(total_cgst));
-	$('input#igst_amount').val(parseFloat(total_igst));
-	$('input#total_amount').val(parseFloat(total_amount));
 
 	$('.amount_before_tax_td').html(parseFloat(total_cost));
 	$('.sgst_amount_td').html(parseFloat(total_sgst));
 	$('.cgst_amount_td').html(parseFloat(total_cgst));
 	$('.igst_amount_td').html(parseFloat(total_igst));
-	//$('.total_amount_td').html(parseFloat(total_amount));
 	$('.total_amount_td').html(parseFloat(total_amount)+'<input id="total_amount" name="total_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount)+'"/>');
-	// $('.total_discount_td').html(parseFloat(total_amount-discount)+'<input name="total_discount_amount" class="form-control " type="hidden" value="'+parseFloat(total_amount-discount)+'"/>');
 
-});
+ });
 
 </script>
 
@@ -829,6 +818,24 @@ $('.datepicker').bootstrapMaterialDatePicker({
     weekStart: 1,
     time: false
 });
+
+$("#vendor_id").change(function(){
+	@php $comapny = getAllFromID(Auth::user()->company_id, 'companies') @endphp
+	var company_gstin = "{{$comapny->gst}}"; 
+	var company_gstin_code = parseInt(company_gstin.substring(0,2));
+	var vendor_gstin = $( "#vendor_id option:selected" ).text().split('#');
+	var vendor_gstin_code = parseInt(vendor_gstin[1].substring(0,2)); 
+
+	if(confirm("If you change the Vendor tax type will also change and it will reflect after saving. Are you sure want to do this?")){
+		if (company_gstin_code == vendor_gstin_code) {
+			$('#tax_type').val(1);
+		}
+		else{
+			$('#tax_type').val(2);
+		}
+	}
+});
+
 </script>
     
 <!-- Select Plugin Js -->

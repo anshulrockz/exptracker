@@ -198,6 +198,7 @@ $(function() {
 			                            <option value="5" @if($users->user_type == 5) selected="selected" @endif >Supervisor</option>
 			                            <option value="3" @if($users->user_type == 3) selected="selected" @endif >Workshop Admin</option>
 			                            <option value="4" @if($users->user_type == 4) selected="selected" @endif >Workshop User</option>
+			                            <option value="6" @if($users->user_type == 6) selected="selected" @endif >Insurer</option>
 			                            
 			                        </select>
 		                    	</div>

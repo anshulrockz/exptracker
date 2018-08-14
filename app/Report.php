@@ -347,7 +347,7 @@ class Report extends Model
 		if(Auth::user()->user_type == 1)
 		{
 			return DB::table('payment_others')
-				->select('payment_others.*', 'users.name as user', 'workshops.name as location')
+				->select('payment_others.*', 'users.name as user', 'workshops.name as location', 'banks.name as bank')
 				->where([
 				['users.company_id',$company],
 				['payment_others.deleted_at',null],
@@ -355,6 +355,7 @@ class Report extends Model
 				])
 	            ->leftJoin('users', 'users.id', '=', 'payment_others.created_by')
 	            ->leftJoin('workshops', 'workshops.id', '=', 'payment_others.location_id')
+	            ->leftJoin('banks', 'banks.id', '=', 'payment_others.bank_id')
 	            ->get();
 		}
 		

@@ -71,7 +71,7 @@
                                 <td>{{date_format(date_create($list->invoice_date),"d/m/Y")}}</td>
                                 <td>{{$list->party_name}}</td>
                                 <td>
-                                    @if($list->round_off==1) {{round($list->amount,0)}} @else {{$list->amount}} @endif
+                                    @if($list->round_off==1) {{round(($list->cost+$list->cgst+$list->sgst+$list->igst),0)}} @else {{($list->cost+$list->cgst+$list->sgst+$list->igst)}} @endif
                                 </td>
                                 <!-- <td>
                                     @if($list->mode==1 || $list->mode=='Cash') Paid
@@ -192,6 +192,14 @@ $('.datepicker').bootstrapMaterialDatePicker({
 <script>
 $(document).ready(function() {
     $('.dataTable').DataTable( {
+        // "processing": true,
+        // "serverSide": true,
+        // "ajax":{
+        //              "url": "/fetch_records",
+        //              "dataType": "json",
+        //              "type": "POST",
+        //              "data":{ _token: "{{csrf_token()}}"}
+        //            },
         "order": [[ 1, "desc" ]],
         fixedHeader: {
             header: true,

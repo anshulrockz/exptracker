@@ -23,7 +23,7 @@
             <div class="body">
                 <ol class="breadcrumb breadcrumb-bg-pink">
                     <li><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="active">Deposits</li>
+                    <li class="active">Cheques</li>
                 </ol>
             </div>
         </div>
@@ -36,7 +36,7 @@
         <div class="card">
             <div class="header" >
                 <h2 id="header">
-                    Deposits 
+                    Cheques 
                 </h2>
                 <!-- <button class="btn btn-primary waves-effect header-dropdown m-r--5" id="print" >Print</button> -->
             </div>
@@ -74,9 +74,10 @@
                                 <th>Created At</th>
                                 <th>Sr. No.</th>
                                 <th>Location</th>
+                                <th>Bank</th>
                                 <th>Date</th>
-                                <th>Payment Date</th>
-                                <th>Payment Mode</th>
+                                <th>Cheque Date</th>
+                                <!-- <th>Payment Mode</th> -->
                                 <th>Cheque No.</th>
                                 <th>Party Name</th>
                                 <th>Cheque Bank</th>
@@ -101,14 +102,15 @@
                                 <td>{{date_format(date_create($list->created_at),"m/d/y")}}</td>
                                 <td>{{$list->uid}}</td>
                                 <td>{{$list->location}}</td>
+                                <td>{{$list->bank}}</td>
                                 <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
                                 <td>{{date_format(date_create($list->date_received),"d/m/Y")}}</td>
-                                <td>
+                                <!-- <td>
                                     @if($list->mode==1) Cash
                                     @elseif($list->mode==2) Cheque
                                     @elseif($list->mode==3) Transfer
                                     @endif
-                                </td>
+                                </td> -->
                                 <td>{{$list->ref_no}}</td>
                                 <td>{{$list->party_name}}</td>
                                 <td>{{$list->cheque_bank}}</td>
@@ -189,13 +191,13 @@ $(document).ready(function() {
              {
                         extend: 'print',
                         exportOptions: {
-                    columns: [ 1, 2, 3, 4, 5, 6, 7 ]
+                    columns: [ 5, 6, 7, 8, 9 ]
                 }
                     },
                     {
                         extend: 'excel',
                         exportOptions: {
-                    columns: [ 1, 2, 3, 4, 5, 6, 7 ]
+                    columns: [ 5, 6, 7, 8, 9 ]
                 }
                     }
         ],

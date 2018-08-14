@@ -11,6 +11,12 @@
 |
 */
 
+Route::get('check-2', function () {
+    $users = DB::connection("mysql2")->table("customer_details")->get();
+    //see you connections established or not.
+    dd($users); 
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -22,7 +28,14 @@ Route::match(['get', 'post'], 'register', function(){
 Auth::routes();
 
 //Route::get('/', 'HomeController@index')->name('home');
-Route::resource('/claim', 'ClaimController');
+Route::group(['middleware' => 'CheckClaimUser'], function() {
+
+	Route::resource('claim', 'ClaimController');
+});
+//Claim Category
+Route::resource('/claim-categories', 'ClaimCategoryController');
+Route::get('/sub-claim-ajax/ajax', 'SubClaimCategoryController@id_ajax');
+Route::resource('/sub-claim-categories', 'SubClaimCategoryController');
 
 //Route::get('/', 'HomeController@index')->name('home');
 Route::get('/dashboard', 'HomeController@index')->name('home');
@@ -31,6 +44,7 @@ Route::get('/dashboard', 'HomeController@index')->name('home');
 Route::get('report/expenses', 'ReportController@expense');
 Route::get('/report/deposits', 'ReportController@deposit');
 Route::get('/report/cheques', 'ReportController@cheque');
+Route::get('/report/claims', 'ReportController@claim');
 Route::get('report/received-payments', 'ReportController@received_payment');
 
 //Expense
@@ -152,14 +166,6 @@ Route::group(['middleware' => 'CheckAdmin'], function() {
 
 		//Sub Asset Category
 		Route::resource('/subassets', 'SubAssetController');
-		
-		//Sub Purchase Category
-		//Route::get('/subpurchase/ajax','SubPurchaseController@id_ajax');
-		//Route::resource('/subpurchase', 'SubPurchaseController');
-
-		//Employees
-		//Route::get('/employees/ajax','EmployeeController@id_ajax');
-		//Route::resource('/employees', 'EmployeeController');
 		
 	});
 

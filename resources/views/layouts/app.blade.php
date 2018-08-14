@@ -37,7 +37,7 @@
     <link href="{{ asset('bsb/css/style.css') }}" rel="stylesheet">
 
     <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
-    <link href="{{ asset('bsb/css/themes/all-themes.css') }}" rel="stylesheet" />
+    <link href="{{ asset('bsb/css/themes/theme-cyan.css') }}" rel="stylesheet" />
     
     <!-- Jquery Core Js -->
     <script src="{{ asset('bsb/plugins/jquery/jquery.min.js') }}"></script>
@@ -280,10 +280,11 @@
                     </li>
                     <!-- #END# Tasks -->
                     <!--<li class="pull-right"><a href="javascript:void(0); " class="js-right-sidebar" data-close="true"><i class="material-icons">more_vert</i></a></li>-->
+                    <li><a href="{{ url('claim')}}" title="Accidental Vehicle Claim"><i class="material-icons">web</i></a></li>
                     <li><a href="{{ url('users/'.Auth::id().'/edit')}}" title="Profile"><i class="material-icons">person</i></a></li>
 					<li><!--a href="javascript:void(0); "><i class="material-icons">input</i>Sign Out</a-->
-						<a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" title="logout">
-							<i class="material-icons">input</i>
+						<a class="btn btn-default btn-circle waves-effect waves-circle waves-float" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" title="logout">
+							<i class="material-icons" style="color: black;font-size: 27px;">input</i>
 						</a>
 						<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
 							{{ csrf_field() }}
@@ -352,7 +353,7 @@
                     </li>
                     @endif
                     @if(auth::user()->user_type == 1)
-                    <li class="{{ Request::is('companies*', 'workshops*', 'designations*', 'expense-categories*', 'users*', 'taxes*', 'descriptions*', 'locations*', 'banks*', 'vendors*', 'expense-categories*', 'purchase-categories*', 'asset-categories*', 'subassets*') ? 'active' : '' }}">
+                    <li class="{{ Request::is('companies*', 'workshops*', 'designations*', 'expense-categories*', 'users*', 'taxes*', 'descriptions*', 'locations*', 'banks*', 'vendors*', 'expense-categories*', 'purchase-categories*', 'asset-categories*', 'subassets*', 'claim-categories*') ? 'active' : '' }}">
                         <a href="javascript:void(0); " class="menu-toggle">
                             <i class="material-icons">perm_data_setting</i>
                             <span>Manage</span>
@@ -391,6 +392,16 @@
                             <li class="{{ Request::is('vendors*') ? 'active' : '' }}" >
                                 <a href="{{ url('/vendors') }}">
                                     <span>Vendors</span>
+                                </a>
+                            </li>
+                            <li class="{{ Request::is('claim-categories*') ? 'active' : '' }}" >
+                                <a href="{{ url('/claim-categories') }}">
+                                    <span>Claim Form Categories</span>
+                                </a>
+                            </li>
+                            <li class="{{ Request::is('sub-claim-categories*') ? 'active' : '' }}" >
+                                <a href="{{ url('/sub-claim-categories') }}">
+                                    <span>Claim Form Sub Categories</span>
                                 </a>
                             </li>
                         	<li class="{{ Request::is('expense-categories*') ? 'active' : '' }}" >
@@ -440,13 +451,13 @@
                     @endif
                     <li class="{{ Request::is('expenses*') ? 'active' : '' }}" >
                         <a href="{{ url('/expenses') }}" >
-                            <i class="material-icons">account_balance_wallet</i>
+                            <i class="material-icons">shopping_basket</i>
                             <span>Expense</span>
                         </a>
                     </li>
                     <li class="{{ Request::is('received-payments*') ? 'active' : '' }}">
                         <a href="{{ url('/received-payments') }}" >
-                            <i class="material-icons">business_center</i>
+                            <i class="material-icons">local_atm</i>
                             <span>Received Payments</span>
                         </a>
                     </li>
@@ -458,7 +469,7 @@
                     </li> -->
                     <li class="{{ Request::is('payment-vendors*') ? 'active' : '' }}" >
                         <a href="{{ url('/payment-vendors') }}" >
-                            <i class="material-icons">receipt</i>
+                            <i class="material-icons">chrome_reader_mode</i>
                             <span>Vendor Acc Statement</span>
                         </a>
                     </li>

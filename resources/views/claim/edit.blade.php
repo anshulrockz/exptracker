@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.claim')
 
 @section('content')
 
@@ -20,22 +20,22 @@ $(function() {
 });
 </script>
 
-<!-- JQuery DataTable Css -->
-<link href="{{ asset('bsb/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css') }}" rel="stylesheet"/>
+<!-- Bootstrap Material Datetime Picker Css -->
+<link href="{{ asset('bsb/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css')}}" rel="stylesheet" />
     
 <div class="row clearfix">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
         	<div class="header">
                 <h2>
-                    Companies
+                    Accidental Vehicle Claim
                 </h2>
             </div>
             <div class="body">
                 <ol class="breadcrumb breadcrumb-bg-pink">
                     <li><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li><a href="{{ url('/companies') }}">Companies</a></li>
-                    <li><a href="{{ url('/companies/'.$company->id) }}">{{$company->name}}</a></li>
+                    <li><a href="{{ url('/claim') }}">Claim</a></li>
+                    <li><a href="{{ url('/claim/'.$customer_details->id) }}">{{$customer_details->name_of_insured}}</a></li>
                     <li class="active">Edit</li>
                 </ol>
             </div>
@@ -57,77 +57,740 @@ $(function() {
                     Details
                 </h2>
             </div>
-            <div class="body">
-                <form id="form" method="post" action="{{route('companies.update',$company->id)}}">
-                	{{ csrf_field() }}
+	        <div class="body">
+	            <form method="post" action="{{route('claim.update',$customer_details->id)}}" enctype="multipart/form-data">
+	            	{{ csrf_field() }}
 	                {{ method_field('PUT') }}
 	                <div class="row clearfix">
-		                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		                    <label for="name">Name</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="name" name="name" class="form-control" placeholder="Enter company name" value="{{ $company->name }}" >
-		                        </div>
-		                    </div>
-		                </div>
-		                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		                    <label for="contact_person">Contact Person</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="contact_person" name="contact_person" class="form-control" placeholder="Enter contact person name" value="{{ $company->contact_person }}">
-		                        </div>
-		                    </div>
-		                </div>
-		                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		                    <label for="mobile">Mobile</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Enter mobile number" value="{{ $company->mobile }}">
-		                        </div>
-		                    </div>
-		                </div>
-		                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		                    <label for="email">Email</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="email" name="email" class="form-control" placeholder="Enter email id" value="{{ $company->email }}">
-		                        </div>
-		                    </div>
-		                </div>
-		                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		                    <label for="cin">Corporate Identity Number</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="cin" name="cin" class="form-control" placeholder="Enter company CIN number" value="{{ $company->cin }}">
-		                        </div>
-		                    </div>
-		                </div>
-		                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-		                    <label for="gst">GST Number</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <input type="text" id="gst" name="gst" class="form-control" placeholder="Enter company GST number" value="{{ $company->gst }}">
-		                        </div>
-		                    </div>
-		                </div>
-		                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-		                    <label for="address">Address</label>
-		                    <div class="form-group">
-		                        <div class="form-line">
-		                            <textarea id="address" name="address" rows="1" class="form-control no-resize auto-growth" placeholder="Enter address of workshop (press ENTER for more lines)">{{ $company->address }}</textarea>
-		                        </div>
-		                    </div>
-		                </div>
-		            </div>
-	                <div class="row clearfix">
-	                	<div class="col-sm-6">
-	                		<button type="submit" id="form-save" class="btn btn-primary waves-effect">Save</button>
-	                		<button type="button" id="form-edit" class="btn btn-primary waves-effect">Edit</button>
-	                	</div>
+	                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+	                        <div id="wizard_vertical1">
+			                    <h2>Customer Detail</h2>
+			                    <section>
+			                        <div class="col-md-6">
+			                            <label for="category">Customer Category</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <select class="form-control show-tick" id="category" name="category">
+			                                        <option value="">-- Please select category --</option>
+			                                        @foreach($type_of_customer as $list)
+			                                        <option value="{{$list->name}}" @if($list->name == $customer_details->category) {{'selected'}} @endif >{{$list->name}}</option>
+			                                        @endforeach
+			                                    </select>
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="name_of_insured">Name of Insured</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="name_of_insured" name="name_of_insured" class="form-control" placeholder="Enter name" value="{{ $customer_details->name_of_insured }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="phone_of_insured">Contact no.</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="phone_of_insured" name="phone_of_insured" class="form-control" placeholder="Enter phone of insured number" value="{{ $customer_details->phone_of_insured }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="email_of_insured">Email</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="email_of_insured" name="email_of_insured" class="form-control" placeholder="Enter email of insured " value="{{ $customer_details->email_of_insured }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="address_of_insured">Address</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <textarea id="address_of_insured" name="address_of_insured" class="form-control" placeholder="Enter address of insured ">{{ $customer_details->address_of_insured }}</textarea>
+			                                </div>
+			                            </div>
+			                        </div>
+
+			                    </section>
+
+			                    <h2>Vehicle Detail</h2>
+			                    <section>
+			                        <div class="col-md-6">
+			                            <label for="vehicle_num">Vehicle Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="vehicle_num" name="vehicle_num" class="form-control" placeholder="Enter company vehicle num" value="{{ $vehicle_details->vehicle_num }}" >
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="chassis_num">Chassis No.</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="chassis_num" name="chassis_num" class="form-control" placeholder="Enter account number" value="{{ $vehicle_details->chassis_num }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="make_num">Make/Model</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <select class="form-control show-tick" id="make_num" name="make_num">
+			                                        <option value="">-- Please select --</option>
+			                                        @foreach($make as $list)
+			                                        <option data-id="{{$list->id}}" value="{{$list->name}}" @if($list->name == $vehicle_details->make_num) selected @endif  >{{$list->name}}</option>
+			                                        @endforeach
+			                                    </select>
+			                                </div>
+			                            </div>
+			                        </div>
+                                    <div class="col-md-6">
+                                        <label for="model_num">Model</label>
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <select class="form-control show-tick" id="model_num" name="model_num">
+                                                    <option value="{{$vehicle_details->model_num}}">{{$vehicle_details->model_num}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+			                        <div class="col-md-6">
+			                            <label for="type_of_vehicle">Type of Vehicle</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <select class="form-control show-tick" id="type_of_vehicle" name="type_of_vehicle">
+			                                        <option value="">-- Please select category --</option>
+			                                        @foreach($type_of_vehicle as $list)
+			                                        <option value="{{$list->name}}" @if($list->name == $vehicle_details->type_of_vehicle) selected @endif >{{$list->name}}</option>
+			                                        @endforeach
+			                                    </select>
+			                                </div>
+			                            </div>
+			                        </div>
+			                    </section>
+
+			                    <h2>Job Detail</h2>
+			                    <section>
+			                        <div class="col-md-6">
+			                            <label for="job_date">Job Date</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="job_date" name="job_date" class="form-control datepicker" placeholder="Enter company job date" value="{{ $claim_job_detail->job_date }}" >
+			                                    <!-- <label class="form-label" for="name">Customer Category</label> -->
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="job_num">Job Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="job_num" name="job_num" class="form-control" placeholder="Enter account number" value="{{ $claim_job_detail->job_num }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="invoice_date">Invoice Date</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="invoice_date" name="invoice_date" class="form-control datepicker" placeholder="Enter invoice date name" value="{{ $claim_job_detail->invoice_date }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="invoice_num">Invoice Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="invoice_num" name="invoice_num" class="form-control" placeholder="Enter company invoice num" value="{{ $claim_job_detail->invoice_num }}" >
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="payment_date">Payment Received Date</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="payment_date" name="payment_date" class="form-control datepicker" placeholder="Payment Received Date" value="{{ $claim_job_detail->payment_date }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="payment_amt">Payment Received Amount</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="payment_amt" name="payment_amt" class="form-control" placeholder="Enter payment rec amt" value="{{ $claim_job_detail->payment_amt }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        @foreach($claim_job_entry as $key => $value)
+			                        <div class="col-md-6">
+			                            <label for="payment_date">Payment Received Date</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text"  class="form-control datepicker" placeholder="Payment Received Date" value="{{ $value->entry_payment_date }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="payment_amt">Payment Received Amount</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" class="form-control" placeholder="Enter payment rec amt" value="{{ $value->entry_payment_amt }}" readonly>
+			                                </div>
+			                            </div>
+			                        </div>
+			                        @endforeach
+			                        <div class="job-entry"></div>
+			                        <div class="col-md-6">
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="payment_date_job" class="form-control datepicker" placeholder="Payment Received Date" >
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-5">
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="number" id="payment_amt_job" class="form-control" placeholder="Payment Received Amount" >
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-1">
+			                            <button type="button" class="add-job-entry btn btn-xs btn-success m-t-15 waves-effect " ><i class="material-icons">add_circle</i></button>
+			                        </div>
+			                    </section>
+
+			                    <h2>Insurance/Claim Detail</h2>
+			                    <section>
+			                        <div class="col-md-6">
+			                            <label for="insurer_name">Insurer’s Name</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <select class="form-control show-tick" id="insurer_name" name="insurer_name">
+                                                    <option value="">-- Please select --</option>
+                                                    @foreach($insurer as $list)
+                                                    <option data-address="{{$list->description}}" data-phone="{{$list->phone}}" value="{{$list->name}}" @if($list->name == $claim_detail->insurer_name) selected @endif
+                                                    	>{{$list->name}}</option>
+                                                    @endforeach
+                                                </select>
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="surveyor_name">Surveyor’s Name</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <select class="form-control show-tick" id="surveyor_name" name="surveyor_name">
+                                                    <option value="">-- Please select --</option>
+                                                    @foreach($surveyor as $list)
+                                                    <option data-address="{{$list->description}}" data-phone="{{$list->phone}}" value="{{$list->name}}" @if($list->name == $claim_detail->surveyor_name) selected @endif >{{$list->name}}</option>
+                                                    @endforeach
+                                                </select>
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="insurer_num">Insurer’s Contact Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="insurer_num" name="insurer_num" class="form-control" placeholder="Enter Insurer’s Contact number" value="{{ $claim_detail->insurer_num }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="surveyor_num">Surveyor’s Contact Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="surveyor_num" name="surveyor_num" class="form-control" placeholder="Enter Surveyor’s Contact Number" value="{{ $claim_detail->surveyor_num }}" >
+			                                    <!-- <label class="form-label" for="name">Customer Category</label> -->
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="office_add">Office Address</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="office_add" name="office_add" class="form-control" placeholder="Enter Office Address" value="{{ $claim_detail->office_add }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="surveyor_add">Surveyor’s Address</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="surveyor_add" name="surveyor_add" class="form-control" placeholder="Enter surveyor add " value="{{ $claim_detail->surveyor_add }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="policy_num">Policy Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="policy_num" name="policy_num" class="form-control" placeholder="Enter policy num" value="{{ $claim_detail->policy_num }}" >
+			                                    <!-- <label class="form-label" for="name">Customer Category</label> -->
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="claim_num">Claim Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="claim_num" name="claim_num" class="form-control" placeholder="Enter claim number" value="{{ $claim_detail->claim_num }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="accident_date">Accident Date</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="accident_date" name="accident_date" class="form-control datepicker" placeholder="Enter accident date" value="{{ $claim_detail->accident_date }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="insured_amount">Sum of Insured Amount</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="insured_amount" name="insured_amount" class="form-control" placeholder="Enter insured amount" value="{{ $claim_detail->insured_amount }}" >
+			                                    <!-- <label class="form-label" for="name">Customer Category</label> -->
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="cost_of_repair">Estimated Cost of Repair</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="cost_of_repair" name="cost_of_repair" class="form-control" placeholder="Enter Cost of Repair" value="{{ $claim_detail->cost_of_repair }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="survey_date">Date of Survey</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="survey_date" name="survey_date" class="form-control datepicker" placeholder="Enter survey date" value="{{ $claim_detail->survey_date }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="survey_place">Place of Survey</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="survey_place" name="survey_place" class="form-control" placeholder="Enter survey place" value="{{ $claim_detail->survey_place }}" >
+			                                    <!-- <label class="form-label" for="name">Customer Category</label> -->
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="reinspection_date">Date of Re-inspection</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="reinspection_date" name="reinspection_date" class="form-control datepicker" placeholder="Enter reinspection date" value="{{ $claim_detail->reinspection_date }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="driver_name">Driver’s Name</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="driver_name" name="driver_name" class="form-control" placeholder="Enter driver name" value="{{ $claim_detail->driver_name }}">
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <div class="col-md-6">
+			                            <label for="driver_licence_num">Driver’s License Number</label>
+			                            <div class="form-group">
+			                                <div class="form-line">
+			                                    <input type="text" id="driver_licence_num" name="driver_licence_num" class="form-control" placeholder="Enter  driver licence num" value="{{ $claim_detail->driver_licence_num }}" >
+			                                    <!-- <label class="form-label" for="name">Customer Category</label> -->
+			                                </div>
+			                            </div>
+			                        </div>
+			                    </section>
+
+			                    <h2>Document Detail</h2>
+			                    <section>
+			                      	
+			                      	<div class="row">
+			                            <div class="col-md-4">
+			                                <div class="form-group">
+			                                    <select class="form-control show-tick" id="document" name="document" >
+			                                        <option value="">-- Please select --</option>
+			                                        @foreach($doc_verification as $list)
+			                                        <option value="{{$list->id}}" >{{$list->name}}</option>
+			                                        @endforeach
+			                                    </select>
+			                                </div>
+			                            </div>
+			                            <div class="col-md-3">
+			                                <div class="form-group">
+			                                    <select class="form-control show-tick" id="doc_status" name="doc_status" >
+			                                        <option value="0">-- Please select --</option>
+			                                        <option value="Yes">Yes</option>
+			                                        <option value="No">No</option>
+			                                    </select>
+			                                </div>
+			                            </div>
+			                            <div class="col-md-2">
+			                                <button type="button" id="add-row" class="add-row btn btn-xs btn-success m-t-15 waves-effect " ><i class="material-icons">add_circle</i></button>
+			                            </div>
+			                        </div>
+			                        <div class="row">
+			                            <div class="col-md-4">
+			                               <label for="code">Document</label>
+			                            </div>
+			                            <div class="col-md-3">
+			                                <label for="code">Received</label>
+			                            </div>
+			                            <div class="col-md-4">
+			                                <label for="code">Upload Document</label>
+			                            </div>
+			                        </div>
+			                        <div class="old-fields">
+			                        	@foreach($document_details_1 as $key => $value)
+			                        	<div class="row">
+				                            <div class="col-md-4">
+				                                <div class="form-group">{{ $value->doc_type }}
+				                                    <input type="hidden" /*name="doc_type[]"*/ class="form-control" value="doc_type" >
+				                                </div>
+				                            </div>
+				                            <div class="col-md-3">
+				                                <div class="form-group">{{$value->doc_status}}
+				                                    <input type="hidden" /*name="doc_status[]"*/ class="form-control" value="doc_status" >
+				                                </div>
+				                            </div>
+				                            <div class="col-md-3">
+				                                <div class="form-group">
+			                                        <div class="fallback">
+					                                    <a href="{{ asset('uploads/claims/'.$value->doc_file)}}" download>
+					                                    	<img border="0" src="{{ asset('uploads/claims/'.$value->doc_file)}}" alt="click to view" width="50" height="50" title="click to view">
+					                                    </a>
+				                                    </div>
+				                                </div>
+				                            </div>
+				                            <div class="col-md-2">
+				                                <input type="hidden" /*name="doc_category[]"*/ class="form-control" value="1" required>
+				                            </div>
+				                        </div>
+				                        @endforeach
+			                        </div>
+			                        <div class="data-field"></div>
+			                    </section>
+
+			                    <h2>KYC Verification</h2>
+			                    <section>
+			                        <div class="row">
+			                            <div class="col-md-4">
+			                                <div class="form-group">
+			                                    <select class="form-control show-tick" id="document_2" >
+			                                        <option value="">-- Please select --</option>
+			                                        @foreach($kyc_verification as $list)
+			                                        <option value="{{$list->id}}" >{{$list->name}}</option>
+			                                        @endforeach
+			                                    </select>
+			                                </div>
+			                            </div>
+			                            <div class="col-md-3">
+			                                <div class="form-group">
+			                                    <select class="form-control show-tick" id="doc_status_2" >
+			                                        <option value="0">-- Please select --</option>
+			                                        <option value="Yes">Yes</option>
+			                                        <option value="No">No</option>
+			                                    </select>
+			                                </div>
+			                            </div>
+			                            <div class="col-md-2">
+			                                <button type="button" id="add-row-2" class="add-row-2 btn btn-xs btn-success m-t-15 waves-effect " ><i class="material-icons">add_circle</i></button>
+			                            </div>
+			                        </div>
+			                        <div class="row">
+			                            <div class="col-md-4">
+			                               <label for="code">Document</label>
+			                            </div>
+			                            <div class="col-md-3">
+			                                <label for="code">Received</label>
+			                            </div>
+			                            <div class="col-md-4">
+			                                <label for="code">Upload Document</label>
+			                            </div>
+			                        </div>
+			                        <div class="old-fields">
+			                        	@foreach($document_details_2 as $key => $value)
+			                        	<div class="row">
+				                            <div class="col-md-4">
+				                                <div class="form-group">{{ $value->doc_type }}
+				                                    <input type="hidden" /*name="doc_type[]"*/ class="form-control" value="doc_type+'" >
+				                                </div>
+				                            </div>
+				                            <div class="col-md-3">
+				                                <div class="form-group">{{$value->doc_status}}
+				                                    <input type="hidden" /*name="doc_status[]"*/ class="form-control" value="doc_status+'" >
+				                                </div>
+				                            </div>
+				                            <div class="col-md-3">
+				                                <div class="form-group">
+			                                        <div class="fallback">
+					                                    <a href="{{ asset('uploads/claims/'.$value->doc_file)}}" download>
+					                                    	<img border="0" src="{{ asset('uploads/claims/'.$value->doc_file)}}" alt="click to view" width="50" height="50" title="click to view">
+					                                    </a>
+					                                </div>
+				                                </div>
+				                            </div>
+				                            <div class="col-md-2">
+				                                <input type="hidden" /*name="doc_category[]"*/ class="form-control" value="1" required>
+				                            </div>
+				                        </div>
+				                        @endforeach
+			                        </div>
+			                        <div class="data-field-2"></div>
+			                    </section>
+
+	                        </div>
+	                    </div>
 	                </div>
-                </form>
-            </div>
-        </div>
-    </div>
+	                <div class="row">
+	                    <div class="col-md-12">
+	                        <button type="submit" class="btn btn-success waves-effect">Update</button>
+	                    </div>
+	                </div>
+	            </form>
+	        </div>
+    	</div>
+ 	</div>
 </div>
+
+<!-- Moment Plugin Js -->
+<script src="{{ asset('bsb/plugins/momentjs/moment.js')}}"></script>
+
+<!-- Bootstrap Material Datetime Picker Plugin Js -->
+<script src="{{ asset('bsb/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js')}}"></script>
+
+<script>
+
+$(document).on("click", "#wizard_vertical1", function () {
+    $('.datepicker').bootstrapMaterialDatePicker({
+        format: 'DD MMMM YYYY',
+        clearButton: true,
+        weekStart: 1,
+        time: false
+    });
+});
+
+</script>
+
+<!-- JQuery Steps Plugin Js -->
+<script src="{{ asset('bsb/plugins/jquery-steps/jquery.steps.js') }}"></script>
+
+<script type="text/javascript">
+$(function(){  
+    
+    $('#wizard_vertical1').on('click', '.add-row', function(e){
+        var doc_type = $('#document option:selected').text();
+        var doc_status = $('#doc_status option:selected').val();
+        // var doc_file = $('#doc_file').val();
+        
+
+
+        if(doc_type == '0' ){ alert("Please select Document") }
+        else if(doc_status == '0'){ alert("Please select status") }
+        // else if(doc_file == '' ){ alert("Please Upload file") }
+
+        else{
+            var delBtn = '<button type="button" class="btn btn-danger btn-xs m-t-15 waves-effect delete-row"><i class="material-icons">remove_circle</i></button>';
+
+            var markup = '<div class="row">'+
+                            '<div class="col-md-4">'+
+                                '<div class="form-group">'+doc_type+
+                                    '<input type="hidden" name="doc_type[]" class="form-control" value="'+doc_type+'" >'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<div class="form-group">'+doc_status+
+                                    '<input type="hidden" name="doc_status[]" class="form-control" value="'+doc_status+'" >'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<div class="form-group">'+
+                                    '<div class="form-line">'+ 
+                                        '<input type="file" name="doc_file[]"  class="form-control"  required>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                delBtn+
+                                '<input type="hidden" name="doc_category[]" class="form-control" value="1" required>'+
+                            '</div>'+
+                        '</div>';
+                              
+            $(".data-field").append(markup);
+        }
+
+    });
+
+    $('#wizard_vertical1').on('click', '.add-row-2', function(e){
+        
+        var doc_type = $('#document_2 option:selected').text();
+        var doc_status = $('#doc_status_2 option:selected').val();
+        
+        if(doc_type == '0' ){ alert("Please select Document") }
+        else if(doc_status == '0'){ alert("Please select status") }
+        else{
+            var delBtn = '<button type="button" class="btn btn-danger btn-xs m-t-15 waves-effect delete-row"><i class="material-icons">remove_circle</i></button>';
+
+            var markup = '<div class="row">'+
+                            '<div class="col-md-4">'+
+                                '<div class="form-group">'+doc_type+
+                                    '<input type="hidden" name="doc_type[]" class="form-control" value="'+doc_type+'" >'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<div class="form-group">'+doc_status+
+                                    '<input type="hidden" name="doc_status[]" class="form-control" value="'+doc_status+'" >'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<div class="form-group">'+
+                                    '<div class="form-line">'+ 
+                                        '<input type="file" name="doc_file[]"  class="form-control"  required>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                delBtn+
+                                '<input type="hidden" name="doc_category[]" class="form-control" value="2" required>'+
+                            '</div>'+
+                        '</div>';
+                              
+            $(".data-field-2").append(markup);
+        }
+
+    });
+
+    $('#wizard_vertical1').on('click', '.add-job-entry', function(){
+        
+        var doc_type = $('#payment_amt_job').val();
+        var doc_status = $('#payment_date_job').val();
+        $('#payment_amt_job').val('');
+        $('#payment_date_job').val('');
+        if(doc_type == '0' ){ alert("Please enter amount") }
+        else if(doc_status == '0'){ alert("Please enter date") }
+        else{
+            var delBtn = '<button type="button" class="btn btn-danger btn-xs m-t-15 waves-effect delete-row"><i class="material-icons">remove_circle</i></button>';
+
+            var markup = '<div class="col-md-6">'+
+                            '<div class="form-group">'+
+                                '<div class="form-line">'+
+                                    '<input type="text" name="entry_payment_date[]" class="form-control datepicker" placeholder="Payment Received Date" value="'+doc_status+'" >'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="col-md-5">'+
+                            '<div class="form-group">'+
+                                '<div class="form-line">'+
+                                    '<input type="number" name="entry_payment_amt[]" class="form-control" placeholder="Payment Received Amount" value="'+doc_type+'">'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="col-md-1">'+
+                            delBtn+
+                        '</div>';
+                              
+            $(".job-entry").append(markup);
+        }
+
+    });
+
+
+    $('#wizard_vertical1').on('click', '.delete-row', function(e){
+        e.preventDefault();
+        $(this).closest(".row").remove();
+    });
+
+    $('#wizard_vertical1').on('change', '#surveyor_name', function(e){
+        e.preventDefault();
+        var address = $('#surveyor_name option:selected').data("address");
+        var phone = $('#surveyor_name option:selected').data("phone");
+        $('#surveyor_num').val(phone);
+        $('#surveyor_add').val(address);
+    });
+
+    $('#wizard_vertical1').on('change', '#insurer_name', function(e){
+        e.preventDefault();
+        var address = $('#insurer_name option:selected').data("address");
+        var phone = $('#insurer_name option:selected').data("phone");
+        $('#insurer_num').val(phone);
+        $('#office_add').val(address);
+    });
+});
+
+</script>
+
+<!-- Demo Js -->
+<script >
+        
+$(function () {
+    $('#wizard_vertical1').steps({
+        headerTag: 'h2',
+        bodyTag: 'section',
+        transitionEffect: 'slideLeft',
+        stepsOrientation: 'vertical',
+        onInit: function (event, currentIndex) {
+            setButtonWavesEffect(event);
+        },
+        onStepChanged: function (event, currentIndex, priorIndex) {
+            setButtonWavesEffect(event);
+        },
+    });
+});
+
+function setButtonWavesEffect(event) {
+    $(event.currentTarget).find('[role="menu"] li a').removeClass('waves-effect');
+    $(event.currentTarget).find('[role="menu"] li:not(.disabled) a').addClass('waves-effect');
+}
+
+</script>
+
+
+<script>
+$(function(){
+// $("#expense_category_main").change(function(){
+$('#wizard_vertical1').on('change', '#make_num', function(){
+    var id = $('#make_num option:selected').data('id'); 
+    if(id != ''){
+        $('#model_num option').remove();
+        $.ajax({
+            type: "GET",
+            url: "{{url('/sub-claim-ajax/ajax')}}",
+            data:'id='+id,
+            success: function(data){
+                var data = JSON.parse(data);
+                var selOpts = "<option>-- select --</option>";
+                if(data.length >0){                 
+                    console.log(data); 
+                    for (i=0;i<data.length;i++)
+                    {
+                        var id = data[i].id; 
+                        var val = data[i].name;
+                        selOpts += "<option value='"+val+"'>"+val+"</option>";
+                    }
+                    $('#model_num').append(selOpts);
+                    $('#model_num').selectpicker('refresh');
+                }
+                else{
+                    $('#model_num option').remove();
+                }
+            }
+        });
+    }
+    else{
+            $('#sub_expenses option').remove();
+    }
+});
+
+	
+});
+</script>
+
+<script type="text/javascript">
+	
+</script>
 @endsection

@@ -72,32 +72,38 @@
                     <table class="table table-bordered table-striped table-hover datatable">
                         <thead class="print-header">
                             <tr>
-                                <th>Created</th>
-                                <th>Location</th>
-                                <th>Voucher</th>
-                                <th>Voucher Date</th>
-                                <th>Invoice No.</th>
-                                <th>Invoice Date</th>
-                                <th>Seller Name</th>
-                                <th>Seller GSTIN</th>
-                                <th>Payment Mode</th>
-                                <th>Payment Status</th>
-                                <th>Supply Type</th>
-                                <th>Supply Cat.</th>
-                                <th>Expense Cat.</th>
-                                <th>Sub-Exp Cat.</th>
-                                <th>Description</th>
-                                <th>Base Value</th>
-                                <th>Quantity</th>
-                                <th>Tol Amt</th>
-                                <th>HSN/SAC</th>
-                                <th>Tax%</th>
-                                <th>SGST</th>
-                                <th>CGST</th>
-                                <th>IGST</th>
-                                <th>Net Amt</th>
-                                <th>Booked By</th>
-                                <th>Status</th>
+                                <th>name_of_insured</th>
+                                <th>category</th>
+                                <th>phone_of_insured</th>
+                                <th>email_of_insured </th>
+                                <th>address_of_insured </th>
+                                <th>insurer_name </th>
+                                <th>surveyor_name</th>
+                                <th>insurer_num</th>
+                                <th>surveyor_num</th>
+                                <th>office_add</th>
+                                <th>surveyor_add</th>
+                                <th>policy_num </th>
+                                <th>claim_num </th>
+                                <th>accident_date</th>
+                                <th>insured_amount</th>
+                                <th>cost_of_repair</th>
+                                <th>survey_date</th>
+                                <th>survey_place</th>
+                                <th>reinspection_date</th>
+                                <th>driver_name</th>
+                                <th>driver_licence_num</th>
+                                <th>vehicle_num</th>
+                                <th>chassis_num</th>
+                                <th>make_num</th>
+                                <th>model_num </th>
+                                <th>type_of_vehicle</th>
+                                <th>job_date</th>
+                                <th>job_num</th>
+                                <th>invoice_date</th>
+                                <th>invoice_num</th>
+                                <th>payment_date</th>
+                                <th>payment_amt</th>
                             </tr>
                         </thead>
                         <tfoot style="display: table-header-group;">
@@ -122,50 +128,51 @@
                             </tr>
                         </tfoot>
                         <tbody class="print-body">
-                        	@foreach( $report as $key=>$list)
+                        	@foreach($report as $key => $value)
                             <tr>
-                                <td>{{date_format(date_create($list->created_at),"m/d/y")}}</td>
-                                <td>{{ $list->location}}</td>
-                            	<td>{{ $list->voucher_no }}</td>
-                                <td>{{date_format(date_create($list->created_at),"d/m/Y")}}</td>
-                            	<td>{{ $list->invoice_no }}</td>
-                                <td>{{date_format(date_create($list->invoice_date),"d/m/Y")}}</td>
-                                <td>{{ $list->party_name}}</td>
-                                <td>{{ $list->party_gstin}}</td>
+                                <td>{{ $value->name_of_insured }}</td>
+                                <td>{{ $value->category }}</td>
+                                <td>{{ $value->phone_of_insured }}</td>
+                                <td>{{ $value->email_of_insured  }}</td>
+                                <td>{{ $value->address_of_insured  }}</td>
+                                <td>{{ $value->insurer_name  }}</td>
+                                <td>{{ $value->surveyor_name }}</td>
+                                <td>{{ $value->insurer_num }}</td>
+                                <td>{{ $value->surveyor_num }}</td>
+                                <td>{{ $value->office_add }}</td>
+                                <td>{{ $value->surveyor_add }}</td>
+                                <td>{{ $value->policy_num  }}</td>
+                                <td>{{ $value->claim_num  }}</td>
+                                <td>{{ $value->accident_date }}</td>
+                                <td>{{ $value->insured_amount }}</td>
+                                <td>{{ $value->cost_of_repair }}</td>
+                                <td>{{ $value->survey_date }}</td>
+                                <td>{{ $value->survey_place }}</td>
+                                <td>{{ $value->reinspection_date }}</td>
+                                <td>{{ $value->driver_name }}</td>
+                                <td>{{ $value->driver_licence_num }}</td>
+                                <td>{{ $value->vehicle_num }}</td>
+                                <td>{{ $value->chassis_num }}</td>
+                                <td>{{ $value->make_num }}</td>
+                                <td>{{ $value->model_num  }}</td>
+                                <td>{{ $value->type_of_vehicle }}</td>
+                                <td>{{ $value->job_date }}</td>
+                                <td>{{ $value->job_num }}</td>
+                                <td>{{ $value->invoice_date }}</td>
+                                <td>{{ $value->invoice_date }}</td>
                                 <td>
-                                    @if($list->paid_in==1) Cash
-                                    @else Credit
-                                    @endif
+                                    {{ $value->payment_date }}
+                                    @foreach($value->job_entries as $key => $entry_date)
+                                        {{$entry_date->entry_payment_date}}
+                                    @endforeach
                                 </td>
                                 <td>
-                                    @if($list->mode==1) Paid
-                                    @else Unpaid
-                                    @endif
+                                    {{ $value->payment_amt }}
+                                    @foreach($value->job_entries as $key => $entry_amt)
+                                        {{$entry_amt->entry_payment_amt}}
+                                    @endforeach
                                 </td>
-                                <td>{{ $list->category1 }}</td>
-                                <td>{{ $list->category2 }}</td>
-                                <td>{{ $list->category3 }}</td>
-                                <td>{{ $list->description}}</td>
-                                <td>{{ $list->reason }}</td>
-                                <td>{{ $list->cost }}</td>
-                                <td>{{ $list->quantity }}</td>
-                                <td>{{ $list->cost*$list->quantity }}</td>
-                                <td>{{ $list->code }}</td>
-                                <td>{{ $list->tax_value }}</td>
-                                <td>{{ $list->sgst }}</td>
-                                <td>{{ $list->cgst }}</td>
-                                <td>{{ $list->igst }}</td>
-                                <td>
-                                    @if($list->round_off==1) {{round( ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst,0)}} 
-                                    @else {{ ($list->cost*$list->quantity)+$list->sgst+$list->cgst+$list->igst }} 
-                                    @endif
-                                </td>
-                                <td>{{ $list->user}} @if(!empty($list->created_for)) ({{$list->created_for}}) @endif </td>
-                                <td>
-                                    @if($list->status==1) Active
-                                    @else Cancelled
-                                    @endif
-                                </td>
+                               
                             </tr>
                             @endforeach
                         </tbody>

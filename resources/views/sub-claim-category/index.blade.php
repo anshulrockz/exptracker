@@ -1,4 +1,4 @@
-@extends('layouts.claim')
+@extends('layouts.app')
 
 @section('content')
 
@@ -12,23 +12,17 @@
         <div class="card">
         	<div class="header">
                 <h2>
-                    Accidental Vehicle Claim
+                    Claim Sub Category
                 </h2>
             </div>
             <div class="body">
                 <ol class="breadcrumb breadcrumb-bg-pink">
                     <li><a href="{{ url('/dashboard') }}">Home</a></li>
-                    <li class="active">Claim</li>
+                    <li class="active">Claim Sub Category</li>
                 </ol>
             </div>
         </div>
     </div>
-</div>
-
-<div class="row clearfix">
-	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-		@include('layouts.flashmessage')
-	</div>
 </div>
 
 <div class="row clearfix">
@@ -38,51 +32,56 @@
                 <h2>
                     All
                 </h2>
-                <a class="btn btn-primary waves-effect header-dropdown m-r--5" href="{{ url('/claim/create')}}">Create New</a>
+                <a class="btn btn-primary waves-effect header-dropdown m-r--5" href="{{ url('sub-claim-categories/create')}}">Create New</a>
             </div>
             <div class="body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover dataTable">
+                    <table class="table table-bordered table-striped table-hover js-basic-example dataTable">
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Category</th>
-                                <th>Mobile</th>
-                                <th>Email</th>
-                                <!-- <th>Status</th> -->
+                                <th>Description</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <!-- <tfoot>
+                        <!--<tfoot>
                             <tr>
-                                <th>Name</th>
-                                <th>Contact Person</th>
-                                <th>Mobile</th>
-                                <th>Email</th>
+                                <th>Asset Category</th>
+                                <th>Sub Category</th>
+                                <th>Description</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
-                        </tfoot> -->
+                        </tfoot>-->
                         <tbody>
-                        	@foreach( $data as $key=>$list)
+                        	@foreach( $data as $key=>$list )
                             <tr>
-                                <td>{{$list->name_of_insured}}</td>
-                                <td>{{$list->category}}</td>
-                                <td>{{$list->phone_of_insured}}</td>
-                                <td>{{$list->email_of_insured}}</td>
+                                <!-- <td>
+                                    @if($list->type_of_category==1) {{"Make"}}
+                                    @elseif($list->type_of_category==2) {{"Type of Vehicle"}}
+                                    @elseif($list->type_of_category==3) {{"Document Verification"}}
+                                    @elseif($list->type_of_category==4) {{"KYC Verification"}}
+                                    @elseif($list->type_of_category==5) {{"Type of Customer"}}
+                                    @else{{"Others"}}
+                                    @endif
+                                </td> -->
+                                <td>{{$list->name}}</td>
+                                <td>{{$list->description}}</td>
                                 <!-- <td>
                                 	@if($list->status==1){{"Active"}}
                                 	@else {{"Inactive"}}
                                 	@endif
                                 </td> -->
                                 <td>
-                                    <a href="{{ url('/claim/'.$list->id)}}" class="btn btn-sm btn-success"> View </a>
-                                    <a href="{{ url('/claim/'.$list->id.'/edit')}}" class="btn btn-xs btn-info"> <i class="material-icons">edit</i> </a>
-                                    <form style="display: inline;" method="post" action="{{route('claim.destroy',$list->id)}}">
+                                    <a href="{{ url('/sub-claim-categories/'.$list->id.'/edit')}}" class="btn btn-xs btn-info"> <i class="material-icons">edit</i> </a>
+                                    <form style="display: inline;" method="post" action="{{route('sub-claim-categories.destroy',$list->id)}}">
 				                        {{ csrf_field() }}
 				                        {{ method_field('DELETE') }}
 				                        <button onclick="return confirm('Are you sure you want to Delete?');" type="submit" class="btn btn-xs btn-danger"><i class="material-icons">delete</i></button>
 				                    </form>
+                                    @if($list->type_of_category==1)
+                                    <a href="{{ url('/sub-claim-categories/'.$list->id)}}" class="btn btn-xs btn-default" title="Add Sub Category"> <i class="material-icons">low_priority</i> </a>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
@@ -112,5 +111,4 @@ $(document).ready(function() {
     } );
 } );
 </script>
-
 @endsection

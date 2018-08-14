@@ -105,7 +105,7 @@ class PaymentVendorController extends Controller
 			$transaction->particulars = 'Discount to Vendor for '.$formInfo->voucher_no;
 		}
 		else{
-			$transaction->particulars = 'Payment to Vendor for '.$formInfo->voucher_no;
+			$transaction->particulars = 'To Payment being voucher no '.$formInfo->voucher_no;
 		}
 		$transaction->user_sys = \Request::ip();
 		$transaction->updated_by = Auth::id();

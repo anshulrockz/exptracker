@@ -73,6 +73,12 @@
 							<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
 								{{ csrf_field() }}
 							</form>
+	                        
+	                        @if(Auth::user()->user_type == 1 || Auth::user()->user_type == 6)
+	                        	<br>
+	                        	<br>
+	                        	<a class="btn btn-default btn-lg waves-effect" href="{{ url('claim/create') }}"><b>Accidental Vehicle Claim</b></a>
+	                        @endif
 						@else
 							<a class="btn btn-default btn-lg waves-effect" href="{{ route('login') }}"><b>Login</b></a>
 						@endauth

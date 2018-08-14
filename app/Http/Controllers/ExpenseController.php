@@ -182,7 +182,7 @@ class ExpenseController extends Controller
 		$transaction->debit = $amount;
 		// $transaction->credit = null;
 		$transaction->txn_type = 10;  	//11-Expense-cash, 1-Expense, 2-Payment
-		$transaction->particulars = 'Spent for expense '.$expense->voucher_no;
+		$transaction->particulars = 'By Payment being voucher no '.$expense->voucher_no;
 		$transaction->user_sys = \Request::ip();
 		$transaction->updated_by = Auth::id();
 		$transaction->created_by = Auth::id();
@@ -291,25 +291,37 @@ class ExpenseController extends Controller
 	    	}
         }
 
+		
+        
+
         $vendor = Vendor::find($request->vendor_id);
 
 		$expense = Expense::find($id);
+
+		$expense_details = Expense::find($id)->ExpenseDetails;
+
+        foreach ($expense_details as $key => $value) {
+        	$expense_details = ExpenseDetail::find($value->id);
+    	    $expense_details->forceDelete($value->id);
+        }
+
 		$date = $request->invoice_date;
 		$expense->invoice_date = date_format(date_create($date),"Y-m-d");
 		$expense->invoice_no = $request->invoice_no;
 		$expense->vendor_id = $request->vendor_id;
 		$expense->party_name = $vendor->name;
 		$expense->party_gstin = $vendor->gst;
+		$expense->inv_type = $request->tax_type;
 		// $expense->party_name = $request->party_name;
 		// $expense->party_gstin = $request->party_gstin;
 		$expense->paid_in = 2;
 		$expense->amount = $request->total_amount;
 		$expense->round_off = $request->round_off;
 		
-		if(Auth::user()->user_type == 1 || Auth::user()->user_type == 5)
+		if(Auth::user()->user_type == 5 || Auth::user()->user_type == 1)
 		$expense->location = $request->location;
-		// else
-		// $expense->location = Auth::user()->workshop_id;
+		else
+		$expense->location = Auth::user()->workshop_id;
 
 		if($expense->mode == 1){
 			$expense->paid_by = Auth::id();
@@ -330,7 +342,6 @@ class ExpenseController extends Controller
 		$result = $expense->save();
 
 		$id = $expense->id;
-
 		$amount = $expense->amount;
 		$detailid = $request->detailid;
 		$supply_type = $request->type;
@@ -346,19 +357,18 @@ class ExpenseController extends Controller
 		$cgst = $request->cgst;
 		$igst = $request->igst;
 		
-		if(isset($request->delRow))
-		{
-			$delRow = $request->delRow;
+		// if(isset($request->delRow))
+		// {
+		// 	$delRow = $request->delRow;
 
-			for($i = 0; $i < count($delRow); $i++)
-			{
-				$expense_details = ExpenseDetail::find($delRow[$i]);
-	    	    $expense_details->delete($delRow[$i]);
-	    	}
-    	}
+		// 	for($i = 0; $i < count($delRow); $i++)
+		// 	{
+		// 		$expense_details = ExpenseDetail::find($delRow[$i]);
+	 //    	    $expense_details->delete($delRow[$i]);
+	 //    	}
+  //   	}
 
 		for($i = 0; $i < count($cost); $i++){
-			
 			$expense_details = new ExpenseDetail;
 			$expense_details->expense_id = $id;
 			$expense_details->category1 = $supply_type[$i];
@@ -379,6 +389,7 @@ class ExpenseController extends Controller
 			$expense_details->save();
 			$amount += ($cost[$i]*$quantity[$i]) + $sgst[$i] +  $cgst[$i] + $igst[$i];
 		}
+		
 		if(Auth::user()->user_type==4 && !empty($expense->created_for)){
 			$transaction = UserTransaction::where('voucher_no', $expense->voucher_no)->first();
 			$transaction->debit = $expense->total_amount;
